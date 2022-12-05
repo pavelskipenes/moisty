@@ -1,10 +1,19 @@
 use super::{meet_info::MeetInfo, Entries};
-use chrono::{Local, DateTime};
+use chrono::{DateTime, Local};
 use serde_xml_rs::from_str;
 use std::error::Error;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
+
+/// # Errors
+/// returns error if:
+/// - native TLS backend cannot be initialized
+/// - supplied Url cannot be parsed
+/// - there was an error while sending request
+/// - redirect loop was detected
+/// - redirect limit was exhausted
+/// - failed to decode response from the server
 
 pub fn get_meet_list(date: DateTime<Local>) -> Result<Vec<MeetInfo>, Box<dyn Error>> {
     let meets_url = "http://medley.no/tidsjekk/stevneoppsett.asmx/VisStevneoppsett?FraNr=1&FraDato="
@@ -17,6 +26,8 @@ pub fn get_meet_list(date: DateTime<Local>) -> Result<Vec<MeetInfo>, Box<dyn Err
     Ok(tmp.meet_setup_entries)
 }
 
+/// Download all `meet_setup.xml` files into `meets/` directory.
+/// Skips meet on error and prints the error message to `stderr`.
 pub fn download(meet_infos: Vec<MeetInfo>) {
     let web_client = reqwest::blocking::Client::new();
     for meet_info in meet_infos {

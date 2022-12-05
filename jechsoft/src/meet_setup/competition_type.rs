@@ -4,15 +4,16 @@ use serde::Deserialize;
 
 use super::error::Error;
 
+/// Competition types
 #[derive(Debug)]
 pub enum CompetitionType {
-    // International championship
+    /// International championship
     International = 5,
     /// Unofficial meet
     Unofficial = 6,
-    // Norwegian Championship
+    /// Norwegian Championship
     NorwegianChampionship = 8,
-    // Local or regional meet without qualifications for athletes over 9 years of age.
+    /// Local or regional meet without qualifications for athletes over 9 years of age.
     RegionalWithoutQualification = 15,
 }
 
@@ -23,10 +24,10 @@ impl Display for CompetitionType {
             // Need to split up self into team and individual. self.to_string() will recursively call this function,
             Some(_) => f.pad(&self.to_string()),
             None => match self {
-                CompetitionType::International => write!(f, "international championship"),
-                CompetitionType::Unofficial => write!(f, "unofficial"),
-                CompetitionType::NorwegianChampionship => write!(f, "norwegian championship"),
-                CompetitionType::RegionalWithoutQualification => {
+                Self::International => write!(f, "international championship"),
+                Self::Unofficial => write!(f, "unofficial"),
+                Self::NorwegianChampionship => write!(f, "norwegian championship"),
+                Self::RegionalWithoutQualification => {
                     write!(f, "regional without qualifications")
                 }
             },
@@ -34,13 +35,15 @@ impl Display for CompetitionType {
     }
 }
 
-impl CompetitionType {
-    fn from_u8(competition_id: u8) -> Result<CompetitionType, Error> {
-        match competition_id {
-            5 => Ok(CompetitionType::International),
-            6 => Ok(CompetitionType::Unofficial),
-            8 => Ok(CompetitionType::NorwegianChampionship),
-            15 => Ok(CompetitionType::RegionalWithoutQualification),
+impl TryFrom<u8> for CompetitionType {
+    type Error = Error;
+
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        match value {
+            5 => Ok(Self::International),
+            6 => Ok(Self::Unofficial),
+            8 => Ok(Self::NorwegianChampionship),
+            15 => Ok(Self::RegionalWithoutQualification),
             _ => Err(Error::CompetitionTypeIdDoesNotExists),
         }
     }
@@ -65,7 +68,7 @@ impl<'de> Deserialize<'de> for CompetitionType {
             }
         };
 
-        match CompetitionType::from_u8(number) {
+        match Self::try_from(number) {
             Ok(distance) => Ok(distance),
             Err(_) => Err(serde::de::Error::unknown_variant(
                 &deserialized_value,

@@ -54,13 +54,11 @@ pub struct Meet {
     #[serde(rename = "MeetPlace")]
     pub location: String,
 
-    /// Undocumented field.
     pub pool_category: PoolCategory,
 
     /// Pool length
     pub pool_length: Distance,
 
-    /// Undocumented field.
     pub start_with_lane: Option<u8>,
 
     /// Number of lanes in the competition.
@@ -72,10 +70,8 @@ pub struct Meet {
     /// Enrollment price in NOK for one enrollment entry for one relay team.
     pub team_price: u16,
 
-    /// Undocumented field.
     pub individual_price2: u16,
 
-    /// Undocumented field.
     pub team_price2: u16,
 
     /// Enrollment price in NOK for athletes that qualify for paying one price for unlimited entries.
@@ -89,14 +85,11 @@ pub struct Meet {
     )]
     pub birth_years_pay_once: Option<Vec<Year>>,
 
-    /// Undocumented field. Something to do with handicap.
     #[serde(deserialize_with = "deserializer::bool")]
     pub australian_model: bool,
 
-    /// Undocumented field.
     pub australian_rank: AustralianRank,
 
-    /// Undocumented field.
     pub australian_world_record: AustralianWorldRecord,
 
     /// Merge all handicap classes into one single handicap class.
@@ -115,27 +108,23 @@ pub struct Meet {
     )]
     pub men_senior: Option<Year>,
 
-    /// Undocumented field.
+    // TODO: men: [Option<Year>; 2];
+    // TODO: women: [Option<Year>; 2];
     #[serde(default, deserialize_with = "deserializer::option_year")]
     pub women_junior: Option<Year>,
 
-    /// Undocumented field.
     #[serde(default, deserialize_with = "deserializer::option_year")]
     pub men_junior: Option<Year>,
 
-    /// Undocumented field.
     #[serde(default, deserialize_with = "deserializer::option_year")]
     pub women_junior2: Option<Year>,
 
-    /// Undocumented field.
     #[serde(default, deserialize_with = "deserializer::option_year")]
     pub men_junior2: Option<Year>,
 
-    /// Undocumented field.
     #[serde(default, deserialize_with = "deserializer::option_year")]
     pub women_youngest_final: Option<Year>,
 
-    /// Undocumented field.
     #[serde(default, deserialize_with = "deserializer::option_year")]
     pub men_youngest_final: Option<Year>,
 
@@ -193,10 +182,8 @@ pub struct Meet {
     /// Starts always with "GR" and then 11 numbers with leading zeros.
     pub host_club_organization_no: Option<String>, // TODO: create struct for this type
 
-    /// Undocumented field.
     pub competition_type_id: CompetitionType,
 
-    /// Undocumented field.
     pub community: Option<String>,
 
     /// Human readable string representation of the meet. Might be redundant because of `competition_type_id`.
@@ -211,23 +198,20 @@ pub struct Meet {
     pub home_page: Option<Url>,
 
     /// enrollment email address
+    // BUG: deserializes to None all the time
     #[serde(default, alias = "MailPameldinger", alias = "EntryMail")]
-    // fixme: deserialize to None all the time
     pub entry_email: Option<Email>,
 
-    /// Undocumented field.
+    /// Payment information for clubs.
     #[serde(default)]
     pub pay_account: String,
 
-    /// Undocumented field.
     #[serde(default, deserialize_with = "deserializer::option_bool")]
     pub general_senior: Option<bool>,
 
-    /// Undocumented field.
     #[serde(default, deserialize_with = "deserializer::option_bool")]
     pub general_junior: Option<bool>,
 
-    /// Undocumented field. Might be if true the meet is primarily for handicap athletes.
     #[serde(
         default,
         rename = "GeneralHC",
@@ -235,11 +219,9 @@ pub struct Meet {
     )]
     pub general_hc: Option<bool>,
 
-    /// Undocumented field. Might be if true the meet is primarily for masters.
     #[serde(default, deserialize_with = "deserializer::option_bool")]
     pub general_masters: Option<bool>,
 
-    /// Undocumented field.
     #[serde(default, deserialize_with = "deserializer::option_bool")]
     pub no_pool: Option<bool>,
 
@@ -247,30 +229,25 @@ pub struct Meet {
     #[serde(deserialize_with = "deserializer::bool")]
     pub cancelled: bool,
 
-    /// Undocumented field.
+    /// Optional info box in meet configuration.
     #[serde(default)]
     pub info: Option<String>,
 
-    /// Undocumented field. Might be preferences for heat list customization.
     #[serde(deserialize_with = "deserializer::bool")]
     pub write_country: bool,
 
-    /// Undocumented field. Might be preferences for heat list customization.
     #[serde(rename = "RecordsInHeatlist", deserialize_with = "deserializer::bool")]
     pub records_in_heat_list: bool,
 
-    /// Undocumented field. Might be preferences for heat list customization.
     #[serde(default, deserialize_with = "deserializer::option_bool")]
     pub write_first_lap: Option<bool>,
 
-    /// Undocumented field. Might be preferences for heat list customization.
     #[serde(
         rename = "PageNumberInHeatlist",
         deserialize_with = "deserializer::option_bool"
     )]
     pub page_number_in_heat_list: Option<bool>,
 
-    /// Undocumented field. Might be preferences for heat list customization.
     #[serde(
         default,
         deserialize_with = "deserializer::option_bool",
@@ -278,19 +255,15 @@ pub struct Meet {
     )]
     pub write_first_stage: Option<bool>,
 
-    /// Undocumented field.
     #[serde(deserialize_with = "deserializer::bool")]
     pub use_group_text: bool,
 
-    /// Undocumented field.
     #[serde(deserialize_with = "deserializer::bool")]
     pub show_time_schedule: bool,
 
-    /// Undocumented field.
     #[serde(deserialize_with = "deserializer::bool")]
     pub show_time_only_heat_one: bool,
 
-    /// Undocumented field.
     #[serde(deserialize_with = "deserializer::bool")]
     pub show_heat_text: bool,
 
@@ -298,7 +271,6 @@ pub struct Meet {
     #[serde(rename = "Touchpads", deserialize_with = "deserializer::touch_pad_set")]
     pub touch_pads: Option<TouchPadSet>,
 
-    /// Undocumented field.
     #[serde(deserialize_with = "deserializer::bool")]
     pub write_other_prices: bool,
 
@@ -306,49 +278,41 @@ pub struct Meet {
     #[serde(deserialize_with = "deserializer::bool")]
     pub unofficial: bool,
 
-    /// Undocumented field.
+    /// TODO: products: HashMap<String, Price>
     #[serde(default)]
     pub other_payment1: Option<String>,
-    /// Undocumented field.
+
     #[serde(default)]
     pub other_price1: Option<u16>,
 
-    /// Undocumented field.
     #[serde(default)]
     pub other_payment2: Option<String>,
-    /// Undocumented field.
+
     #[serde(default)]
     pub other_price2: Option<u16>,
 
-    /// Undocumented field.
     #[serde(default)]
     pub other_payment3: Option<String>,
-    /// Undocumented field.
+
     #[serde(default)]
     pub other_price3: Option<u16>,
 
-    /// Undocumented field.
     #[serde(deserialize_with = "deserializer::bool")]
     pub write_date_time: bool,
 
-    /// Undocumented field.
     pub header: Option<String>,
 
-    /// Undocumented field.
     pub footer: Option<String>,
 
     /// Default award configuration for the meet. This value is used if this.events.awards = Award::Default.
     #[serde(rename = "Prizes")]
     pub awards: Option<Award>,
 
-    /// Undocumented field. Might be preferences for time scheduling.
     #[serde(default, deserialize_with = "deserializer::option_bool")]
     pub start_on_minute: Option<bool>,
 
-    /// Undocumented field. Might be preferences for time scheduling.
     pub time_between: Option<u16>,
 
-    /// Undocumented field. Might be preferences for time scheduling.
     pub extra_time: Option<u16>,
 
     /// List of sessions in the meet. A session is a set of continuos heats without breaks.
@@ -359,15 +323,14 @@ pub struct Meet {
     #[serde(default)]
     pub qualification_set: Option<QualificationSet>,
 
-    /// Undocumented field
+    /// Host representative for managing enrollment.
     #[serde(rename = "EntryManager")]
     pub entry_manager: Option<Person>,
 
-    /// Undocumented field.
     // #[serde(rename = "DefinedAgeGroups")]
     // pub age_groups: DefinedAgeGroups,
 
-    /// Undocumented field
+    /// Host representative for managing the meet. Also called "meet leader".
     #[serde(rename = "CompetitionManager")]
     pub competition_manager: Option<Person>,
 
@@ -377,6 +340,11 @@ pub struct Meet {
 }
 
 impl Meet {
+    ///#  Errors
+    /// returns Error if:
+    /// - `local_xml_file` cannot be opened.
+    /// - deserialization fails
+
     pub fn from(local_xml_file: &Path) -> Result<Self, Box<dyn Error>> {
         let file = File::open(local_xml_file)?;
 

@@ -3,6 +3,9 @@ use chrono::NaiveDate;
 use reqwest::Url;
 use serde::Deserialize;
 
+/// Meet info structure parses output from a url endpoint used by "JechSoft Victoria"
+/// for searching upcoming meets and download them into it's database without downloading
+/// it manually from [https://medley.no](https://medley.no)
 #[derive(Deserialize, Debug)]
 #[serde(rename = "strc_stevneoppsett")]
 pub struct MeetInfo {

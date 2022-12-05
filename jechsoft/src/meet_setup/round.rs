@@ -1,38 +1,37 @@
 use std::fmt;
 
+use serde::Deserialize;
+
 #[derive(Debug)]
 #[allow(dead_code)]
 pub enum Round {
-    /// Undocumented variant.
     Final,
-    /// Undocumented variant.
     Final8,
-    /// Undocumented variant.
     DirectFinal,
-    /// Undocumented variant.
     QuarterFinal,
-    /// Undocumented variant.
     SemiFinal,
-    /// Undocumented variant.
     Preliminary,
+    Undefined,
 }
 
-pub fn deserialize<'de, D>(deserializer: D) -> Result<Option<Round>, D::Error>
-where
-    D: serde::de::Deserializer<'de>,
-{
-    let s: String = serde::de::Deserialize::deserialize(deserializer)?;
-    match s.as_str() {
-        "8FINAL" => Ok(Some(Round::Final8)),
-        "DIRECTFINAL" => Ok(Some(Round::DirectFinal)),
-        "SEMIFINAL" => Ok(Some(Round::SemiFinal)),
-        "FINAL" => Ok(Some(Round::Final)),
-        "PRELIMINARY" => Ok(Some(Round::Preliminary)),
-        "UNDEFINED" => Ok(None),
-        string => Err(serde::de::Error::custom(format!(
-            "Could not decode {} as Round type",
-            string
-        ))),
+impl<'de> Deserialize<'de> for Round {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s: String = serde::de::Deserialize::deserialize(deserializer)?;
+        match s.as_str() {
+            "8FINAL" => Ok(Self::Final8),
+            "DIRECTFINAL" => Ok(Self::DirectFinal),
+            "SEMIFINAL" => Ok(Self::SemiFinal),
+            "FINAL" => Ok(Self::Final),
+            "PRELIMINARY" => Ok(Self::Preliminary),
+            "UNDEFINED" => Ok(Self::Undefined),
+            string => Err(serde::de::Error::custom(format!(
+                "Could not decode {} as Round type",
+                string
+            ))),
+        }
     }
 }
 
@@ -44,12 +43,13 @@ impl fmt::Display for Round {
                 f,
                 "{}",
                 match self {
-                    Round::Final => "final",
-                    Round::SemiFinal => "semi final",
-                    Round::QuarterFinal => "quarter final",
-                    Round::Final8 => "8 final",
-                    Round::DirectFinal => "direct final",
-                    Round::Preliminary => "preliminary",
+                    Self::Final => "final",
+                    Self::SemiFinal => "semi final",
+                    Self::QuarterFinal => "quarter final",
+                    Self::Final8 => "8 final",
+                    Self::DirectFinal => "direct final",
+                    Self::Preliminary => "preliminary",
+                    Self::Undefined => "undefined",
                 }
             ),
             Some(_) => f.pad(&self.to_string()),

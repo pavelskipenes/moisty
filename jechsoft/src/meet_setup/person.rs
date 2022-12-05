@@ -3,6 +3,7 @@ use serde::Deserialize;
 
 use super::gender_group::GenderGroup;
 
+/// Simple person struct
 #[derive(Debug, Deserialize)]
 pub struct Person {
     /// Surname.
@@ -18,7 +19,6 @@ pub struct Person {
     pub gender: GenderGroup,
 
     /// Birth date.
-    /// TODO: create custom deserializer that returns None on failure because "SR" is a valid birth date
     #[serde(
         rename = "BirthDate",
         deserialize_with = "deserialize_birth_date",
@@ -31,6 +31,7 @@ pub struct Person {
     pub club: String,
 }
 
+/// Deserialize bith date in Person struct
 fn deserialize_birth_date<'de, D>(deserializer: D) -> Result<Option<Year>, D::Error>
 where
     D: serde::Deserializer<'de>,

@@ -1,12 +1,6 @@
 use super::{
-    award::Award,
-    deserializer,
-    distance::Distance,
-    gender_group::GenderGroup,
-    pool_length::PoolLength,
-    round::{self, Round},
-    sorting::Sorting,
-    style::Style,
+    award::Award, deserializer, distance::Distance, gender_group::GenderGroup,
+    pool_length::PoolLength, round::Round, sorting::Sorting, style::Style,
 };
 use chrono::NaiveDate;
 use serde::Deserialize;
@@ -16,8 +10,10 @@ use std::time::Duration;
 #[derive(Deserialize, Debug)]
 #[allow(clippy::struct_excessive_bools)]
 #[serde(rename_all = "PascalCase")]
+
+/// Stored configuration for Event inside `meetsetup.xml`
 pub struct Event {
-    /// event number. Starts with 1.
+    /// Event number. Starts with 1.
     #[serde(rename = "EventNumber")]
     pub id: u32,
 
@@ -37,38 +33,34 @@ pub struct Event {
     #[serde(rename = "Sex")]
     pub gender_group: GenderGroup,
 
-    /// Undocumented field.
     #[serde(deserialize_with = "deserializer::bool")]
     pub senior: bool,
 
-    /// Undocumented field.
     #[serde(deserialize_with = "deserializer::bool")]
     pub junior: bool,
 
-    /// Undocumented field.
     #[serde(deserialize_with = "deserializer::bool")]
     pub junior_older: bool,
 
-    /// Undocumented field.
     #[serde(deserialize_with = "deserializer::bool")]
     pub junior_younger: bool,
 
-    /// Undocumented field.
     #[serde(deserialize_with = "deserializer::option_year", default)]
     pub youngest: Option<datetime::Year>,
 
-    /// Undocumented field.
     #[serde(deserialize_with = "deserializer::option_year", default)]
     pub oldest: Option<datetime::Year>,
 
-    /// Undocumented field.
     pub event_pool_length: PoolLength,
 
     /// Starting date for the meet
     #[serde(deserialize_with = "deserializer::date")]
     pub date: NaiveDate,
 
-    /// Undocumented field.
+    // TODO: members `qualification_time_long_course` and `qualification_time_short_course`
+    // should probably be merged together as a QualificationTime struct where
+    // method would provide a duration for either short course or long course
+    /// Optional qualification time for this event.
     #[serde(
         default,
         rename = "QualLongCourse",
@@ -76,7 +68,6 @@ pub struct Event {
     )]
     pub qualification_time_long_course: Option<Duration>,
 
-    /// Undocumented field.
     #[serde(
         default,
         rename = "QualShortCourse",
@@ -84,33 +75,27 @@ pub struct Event {
     )]
     pub qualification_time_short_course: Option<Duration>,
 
-    /// Undocumented field.
     pub sorting: Sorting,
 
     /// No qualification for handicap.
     #[serde(deserialize_with = "deserializer::bool", rename = "NoQualHcEvent")]
     pub no_qualification_for_handicap: bool,
 
-    /// Undocumented field.
     #[serde(deserialize_with = "deserializer::bool", rename = "Webheat")]
     pub web_heat: bool,
 
     /// Event sponsor text. Hint for other applications that might use this information if it faces end users.
     pub sponsor: Option<String>,
 
-    /// Undocumented field.
     #[serde(deserialize_with = "deserializer::bool", rename = "SRJRCOMBI")]
     pub srjrcombi: bool,
 
-    /// Undocumented field,
     #[serde(deserialize_with = "deserializer::bool", alias = "FREE")]
     pub free: bool,
 
-    /// Undocumented field.
     #[serde(deserialize_with = "deserializer::bool")]
     pub dont_show_age_group: bool,
 
-    /// Undocumented field.
     #[serde(deserialize_with = "deserializer::bool")]
     pub show_entry_times: bool,
 
@@ -118,7 +103,7 @@ pub struct Event {
     #[serde(rename = "Prizes")]
     pub awards: Option<Award>,
 
-    #[serde(deserialize_with = "round::deserialize")]
+    #[serde(default)]
     pub round: Option<Round>,
 
     /// If true the last heat will march in to start block on last heat.

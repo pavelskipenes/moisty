@@ -17,9 +17,9 @@ impl fmt::Display for GenderGroup {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match f.align() {
             None => match self {
-                GenderGroup::Male => write!(f, "male"),
-                GenderGroup::Female => write!(f, "female"),
-                GenderGroup::Mixed => write!(f, "mixed"),
+                Self::Male => write!(f, "male"),
+                Self::Female => write!(f, "female"),
+                Self::Mixed => write!(f, "mixed"),
             },
             Some(_) => f.pad(&self.to_string()),
         }

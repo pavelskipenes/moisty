@@ -7,32 +7,36 @@ use super::{
     style::Style,
 };
 
+/// Single qualification sets limits on who can enroll to a meet.
+/// `Athlete`s `TimeResult` has to be less than `qualification_time` to
+/// enroll.
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct Qualification {
-    /// Undocumented field.
-    pub class: Class,
+    /// Qualification is valid for this class.
+    pub athlete_class: Class,
 
-    /// Undocumented field.
+    /// Qualification applies to this gender.
+    #[serde(rename = "Sex")]
+    pub athlete_gender: GenderGroup,
+
+    /// Length of the pool of the TimeResult required.
+    pub event_pool_length: PoolLength,
+
+    /// Distance of the Event that the qualification applies to
+    #[serde(rename = "DistanceLength")]
+    pub event_distance: Distance,
+
+    /// Style this qualification applies to.
+    #[serde(rename = "Distanceart")]
+    pub event_style: Style,
+
+    /// Max time an athlete can have for successful enrollment.
     #[serde(deserialize_with = "duration")]
     pub qualification_time: Duration,
-
-    /// Undocumented field.
-    pub pool_length: PoolLength,
-
-    /// Undocumented field.
-    #[serde(rename = "Sex")]
-    pub gender: GenderGroup,
-
-    /// Undocumented field.
-    #[serde(rename = "DistanceLength")]
-    pub distance: Distance,
-
-    /// Undocumented field.
-    #[serde(rename = "Distanceart")]
-    pub style: Style,
 }
 
+/// Deserializer for Qualification structure
 pub fn duration<'de, D>(deserializer: D) -> Result<Duration, D::Error>
 where
     D: serde::de::Deserializer<'de>,

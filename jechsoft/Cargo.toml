@@ -2,20 +2,18 @@
 name = "jechsoft"
 version = "0.1.0"
 edition = "2021"
+description= "Some description"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-serde = { version = "1.0.147", features = ["derive"] }
-chrono = "0.4.22"
+serde = { version = "1.0.148", features = ["derive"] }
+chrono = "0.4.23"
 datetime = "0.5.2"
-time = { version = "0.3.16", features = ["parsing", "formatting", "macros"] }
-reqwest = { version = "0.11.12", features = ["blocking"] }
+time = { version = "0.3.17", features = ["parsing", "formatting", "macros"] }
+reqwest = { version = "0.11.13", features = ["blocking"] }
 url = { version = "2.3.1", features = ["serde"] }
 serde-xml-rs = "0.6.0"
 thiserror = "1.0.37"
 serde-email = "1.1.0"
 serde_path_to_error = "0.1.8"
-# todo: remove one of email dependencies
-#email = "0.0.21"
-#email_address = "0.2.3"

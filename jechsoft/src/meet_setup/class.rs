@@ -9,8 +9,11 @@ use super::{error::Error, handicap::Handicap, junior::Junior};
 
 #[derive(Debug)]
 pub enum Class {
+    /// Athletes that is older than 19 years old.
     Senior,
+    /// For Athletes age 9 and 19. Junior team relays is not bound by year.
     Junior(Option<Year>), // Team relays is not bound by year
+    /// For disabled Athletes
     Handicap(Handicap),
 }
 
@@ -18,14 +21,12 @@ impl Class {
     pub fn get_class_group(&self, meet_year: Year) -> Result<Junior, Error> {
         let meet_year = meet_year.abs();
         if let Self::Junior(year) = self {
-            if let Some(year) = year {
+            year.map_or(Err(Error::TeamRelaysDoesNotHaveJuniorClassGroup), |year| {
                 match Junior::try_from(meet_year.abs_diff(year.abs())) {
                     Ok(junior_class) => Ok(junior_class),
                     Err(_) => Err(Error::NotAJuniorAge),
                 }
-            } else {
-                Err(Error::TeamRelaysDoesNotHaveJuniorClassGroup)
-            }
+            })
         } else {
             Err(Error::NotAJuniorVariant)
         }

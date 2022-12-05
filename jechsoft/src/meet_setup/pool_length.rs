@@ -1,5 +1,6 @@
 use serde::Deserialize;
 
+/// Length of the pool
 #[derive(Deserialize, Debug)]
 pub enum PoolLength {
     /// 25 meters pool. Often called "short course".

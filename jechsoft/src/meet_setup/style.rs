@@ -5,6 +5,8 @@ use std::fmt;
 #[serde(rename_all = "UPPERCASE")]
 #[allow(clippy::enum_variant_names)]
 #[allow(clippy::module_name_repetitions)]
+
+/// Stroke
 pub enum Stroke {
     /// Backstroke.
     BackStroke,
@@ -16,6 +18,8 @@ pub enum Stroke {
     Butterfly,
 }
 
+/// `Style` of the `Event`. A wrapper for `Stroke` to account for `Medley`
+/// which is a list of `Stroke`s.
 #[derive(Debug)]
 pub enum Style {
     /// Single stroke.
@@ -36,12 +40,12 @@ impl<'de> Deserialize<'de> for Style {
 
         // TODO: add hc medley variant
         match deserialized_value.as_ref() {
-            "FREESTYLE" => Ok(Style::Single(Stroke::FreeStyle)),
-            "BUTTERFLY" => Ok(Style::Single(Stroke::Butterfly)),
-            "BACKSTROKE" => Ok(Style::Single(Stroke::BackStroke)),
-            "BREASTSTROKE" => Ok(Style::Single(Stroke::BreastStroke)),
-            "INDIVIDUALMEDLEY" => Ok(Style::Medley(INDIVIDUAL_MEDLEY)), // this string is present for handicapped individual medley relays as well as regular medley relays
-            "MEDLEYRELAY" => Ok(Style::Medley(TEAM_MEDLEY)),
+            "FREESTYLE" => Ok(Self::Single(Stroke::FreeStyle)),
+            "BUTTERFLY" => Ok(Self::Single(Stroke::Butterfly)),
+            "BACKSTROKE" => Ok(Self::Single(Stroke::BackStroke)),
+            "BREASTSTROKE" => Ok(Self::Single(Stroke::BreastStroke)),
+            "INDIVIDUALMEDLEY" => Ok(Self::Medley(INDIVIDUAL_MEDLEY)), // this string is present for handicapped individual medley relays as well as regular medley relays
+            "MEDLEYRELAY" => Ok(Self::Medley(TEAM_MEDLEY)),
             _ => Err(serde::de::Error::unknown_variant(
                 &deserialized_value,
                 &[
@@ -57,6 +61,7 @@ impl<'de> Deserialize<'de> for Style {
     }
 }
 
+/// Individual medley with styles in order
 pub const INDIVIDUAL_MEDLEY: [Stroke; 4] = [
     Stroke::Butterfly,
     Stroke::BackStroke,
@@ -64,6 +69,7 @@ pub const INDIVIDUAL_MEDLEY: [Stroke; 4] = [
     Stroke::FreeStyle,
 ];
 
+/// Team medley with it's styles in order
 pub const TEAM_MEDLEY: [Stroke; 4] = [
     Stroke::BackStroke,
     Stroke::BreastStroke,
@@ -79,12 +85,12 @@ impl fmt::Display for Style {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match f.align() {
             None => match self {
-                Style::Medley(medley) => match *medley {
+                Self::Medley(medley) => match *medley {
                     TEAM_MEDLEY => write!(f, "team medley"),
                     INDIVIDUAL_MEDLEY => write!(f, "individual medley"),
                     _ => Err(fmt::Error::custom("Not a valid medley order")),
                 },
-                Style::Single(a) => match a {
+                Self::Single(a) => match *a {
                     Stroke::BackStroke => write!(f, "backstroke"),
                     Stroke::FreeStyle => write!(f, "freestyle"),
                     Stroke::Butterfly => write!(f, "butterfly"),
