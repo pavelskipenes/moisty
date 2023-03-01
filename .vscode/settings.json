@@ -4,6 +4,7 @@
         "chrono",
         "Datelike",
         "datetime",
+        "deciseconds",
         "Distanceart",
         "Heatlist",
         "heatlists",

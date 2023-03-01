@@ -101,21 +101,21 @@ impl<'de> Deserialize<'de> for Distance {
 #[derive(Deserialize, Debug, Clone)]
 pub enum Individual {
     #[serde(rename = "25")]
-    Distance25,
+    Distance25 = 25,
     #[serde(rename = "50")]
-    Distance50,
+    Distance50 = 50,
     #[serde(rename = "100")]
-    Distance100,
+    Distance100 = 100,
     #[serde(rename = "150")]
-    Distance150,
+    Distance150 = 150,
     #[serde(rename = "200")]
-    Distance200,
+    Distance200 = 200,
     #[serde(rename = "400")]
-    Distance400,
+    Distance400 = 400,
     #[serde(rename = "800")]
-    Distance800,
+    Distance800 = 800,
     #[serde(rename = "1500")]
-    Distance1500,
+    Distance1500 = 1500,
 }
 
 impl TryFrom<isize> for Individual {
@@ -140,7 +140,7 @@ impl TryFrom<isize> for Individual {
 impl fmt::Display for Individual {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match f.align() {
-            None => write!(f, "{}m", *self as u16),
+            None => write!(f, "{}m", self.clone() as u16),
             Some(_) => f.pad(&self.to_string()),
         }
     }

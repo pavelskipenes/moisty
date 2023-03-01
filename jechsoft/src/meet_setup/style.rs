@@ -1,4 +1,4 @@
-use serde::{ser::Error, Deserialize};
+use serde::Deserialize;
 use std::fmt;
 
 #[derive(Deserialize, Debug, PartialEq, Eq)]
@@ -38,15 +38,8 @@ impl<'de> Deserialize<'de> for Style {
     {
         let deserialized_value: String = Deserialize::deserialize(deserializer)?;
 
-        // TODO: add hc medley variant
-        match deserialized_value.as_ref() {
-            "FREESTYLE" => Ok(Self::Single(Stroke::FreeStyle)),
-            "BUTTERFLY" => Ok(Self::Single(Stroke::Butterfly)),
-            "BACKSTROKE" => Ok(Self::Single(Stroke::BackStroke)),
-            "BREASTSTROKE" => Ok(Self::Single(Stroke::BreastStroke)),
-            "INDIVIDUALMEDLEY" => Ok(Self::Medley(INDIVIDUAL_MEDLEY)), // this string is present for handicapped individual medley relays as well as regular medley relays
-            "MEDLEYRELAY" => Ok(Self::Medley(TEAM_MEDLEY)),
-            _ => Err(serde::de::Error::unknown_variant(
+        Self::try_from(deserialized_value.as_ref()).map_err(|_| {
+            serde::de::Error::unknown_variant(
                 &deserialized_value,
                 &[
                     "FREESTYLE",
@@ -56,11 +49,39 @@ impl<'de> Deserialize<'de> for Style {
                     "INDIVIDUALMEDLEY",
                     "MEDLEYRELAY",
                 ],
-            )),
-        }
+            )
+        })
     }
 }
 
+pub enum Error {
+    Unknown,
+}
+
+impl TryFrom<&str> for Style {
+    type Error = Error;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        // TODO: add hc medley variant
+        match value {
+            // uni_p
+            "FR" => Ok(Self::Single(Stroke::FreeStyle)),
+            "BU" => Ok(Self::Single(Stroke::Butterfly)),
+            "RY" => Ok(Self::Single(Stroke::BackStroke)),
+            "BR" => Ok(Self::Single(Stroke::BreastStroke)),
+            "IM" => Ok(Self::Medley(INDIVIDUAL_MEDLEY)),
+            "LM" => Ok(Self::Medley(TEAM_MEDLEY)),
+            // meetsetup.xml
+            "FREESTYLE" => Ok(Self::Single(Stroke::FreeStyle)),
+            "BUTTERFLY" => Ok(Self::Single(Stroke::Butterfly)),
+            "BACKSTROKE" => Ok(Self::Single(Stroke::BackStroke)),
+            "BREASTSTROKE" => Ok(Self::Single(Stroke::BreastStroke)),
+            "INDIVIDUALMEDLEY" => Ok(Self::Medley(INDIVIDUAL_MEDLEY)), // this string is present for handicapped individual medley relays as well as regular medley relays
+            "MEDLEYRELAY" => Ok(Self::Medley(TEAM_MEDLEY)),
+            _ => Err(Error::Unknown),
+        }
+    }
+}
 /// Individual medley with styles in order
 pub const INDIVIDUAL_MEDLEY: [Stroke; 4] = [
     Stroke::Butterfly,
@@ -88,7 +109,7 @@ impl fmt::Display for Style {
                 Self::Medley(medley) => match *medley {
                     TEAM_MEDLEY => write!(f, "team medley"),
                     INDIVIDUAL_MEDLEY => write!(f, "individual medley"),
-                    _ => Err(fmt::Error::custom("Not a valid medley order")),
+                    _ => Err(std::fmt::Error),
                 },
                 Self::Single(a) => match *a {
                     Stroke::BackStroke => write!(f, "backstroke"),
