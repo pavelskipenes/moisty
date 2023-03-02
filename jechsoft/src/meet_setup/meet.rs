@@ -329,7 +329,6 @@ pub struct Meet {
 
     // #[serde(rename = "DefinedAgeGroups")]
     // pub age_groups: DefinedAgeGroups,
-
     /// Host representative for managing the meet. Also called "meet leader".
     #[serde(rename = "CompetitionManager")]
     pub competition_manager: Option<Person>,
