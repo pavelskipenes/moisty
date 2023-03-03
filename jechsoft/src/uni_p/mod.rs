@@ -1,12 +1,10 @@
-/// uni_p.txt is a csv filetype that contains enrollment information
-use std::{num::ParseIntError, time::Duration};
-
-use serde::Deserialize;
-
+/// `uni_p.txt` is a csv filetype that contains enrollment information
 use crate::meet_setup::{
     distance::Distance, gender_class::GenderClass, gender_group::GenderGroup,
     pool_length::PoolLength, style::Style,
 };
+use serde::Deserialize;
+use std::{num::ParseIntError, time::Duration};
 
 #[derive(Deserialize)]
 pub struct EnrollmentEntry {

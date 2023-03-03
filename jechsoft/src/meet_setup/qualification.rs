@@ -1,11 +1,9 @@
-use std::time::Duration;
-
-use serde::Deserialize;
-
 use super::{
     class::Class, distance::Distance, gender_group::GenderGroup, pool_length::PoolLength,
     style::Style,
 };
+use serde::Deserialize;
+use std::time::Duration;
 
 /// Single qualification sets limits on who can enroll to a meet.
 /// `Athlete`s `TimeResult` has to be less than `qualification_time` to

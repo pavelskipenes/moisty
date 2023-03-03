@@ -1,8 +1,6 @@
-use std::fmt::{Display, Formatter};
-
-use serde::Deserialize;
-
 use super::error::Error;
+use serde::Deserialize;
+use std::fmt::{Display, Formatter};
 
 /// Competition types
 #[derive(Debug)]
@@ -58,23 +56,21 @@ impl<'de> Deserialize<'de> for CompetitionType {
 
         let number = match deserialized_value.parse::<u8>() {
             Ok(number) => number,
-            Err(_) => {
-                return {
-                    Err(serde::de::Error::unknown_variant(
-                        &deserialized_value,
-                        &["parsable integer"],
-                    ))
-                };
-            }
-        };
-
-        match Self::try_from(number) {
-            Ok(distance) => Ok(distance),
             Err(_) => Err(serde::de::Error::unknown_variant(
                 &deserialized_value,
-                &["DEFAULT", "MEDALS", "NO", "3"],
-            )),
-        }
+                &["parsable integer"],
+            ))?,
+        };
+
+        Self::try_from(number).map_or_else(
+            |_| {
+                Err(serde::de::Error::unknown_variant(
+                    &deserialized_value,
+                    &["DEFAULT", "MEDALS", "NO", "3"],
+                ))
+            },
+            Ok,
+        )
     }
 }
 

@@ -23,8 +23,9 @@ where
     D: serde::de::Deserializer<'de>,
 {
     let s: Option<String> = serde::de::Deserialize::deserialize(deserializer)?;
-    match s {
-        Some(s) => match s.as_str() {
+    s.map_or_else(
+        || Ok(None),
+        |s| match s.as_str() {
             "TRUE" => Ok(Some(true)),
             "FALSE" => Ok(Some(false)),
             _ => Err(serde::de::Error::unknown_variant(
@@ -32,8 +33,7 @@ where
                 &["TRUE", "FALSE", ""],
             )),
         },
-        None => Ok(None),
-    }
+    )
 }
 
 pub fn option_date<'de, D>(deserializer: D) -> Result<Option<NaiveDate>, D::Error>
@@ -119,8 +119,7 @@ where
         "ONE SET" => Ok(Some(TouchPadSet::OneSet)),
         "NO" => Ok(None),
         string => Err(serde::de::Error::custom(format!(
-            "Could not decode {} as TouchPadSet type",
-            string
+            "Could not decode {string} as TouchPadSet type"
         ))),
     }
 }

@@ -64,20 +64,12 @@ impl TryFrom<&str> for Style {
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         // TODO: add hc medley variant
         match value {
-            // uni_p
-            "FR" => Ok(Self::Single(Stroke::FreeStyle)),
-            "BU" => Ok(Self::Single(Stroke::Butterfly)),
-            "RY" => Ok(Self::Single(Stroke::BackStroke)),
-            "BR" => Ok(Self::Single(Stroke::BreastStroke)),
-            "IM" => Ok(Self::Medley(INDIVIDUAL_MEDLEY)),
-            "LM" => Ok(Self::Medley(TEAM_MEDLEY)),
-            // meetsetup.xml
-            "FREESTYLE" => Ok(Self::Single(Stroke::FreeStyle)),
-            "BUTTERFLY" => Ok(Self::Single(Stroke::Butterfly)),
-            "BACKSTROKE" => Ok(Self::Single(Stroke::BackStroke)),
-            "BREASTSTROKE" => Ok(Self::Single(Stroke::BreastStroke)),
-            "INDIVIDUALMEDLEY" => Ok(Self::Medley(INDIVIDUAL_MEDLEY)), // this string is present for handicapped individual medley relays as well as regular medley relays
-            "MEDLEYRELAY" => Ok(Self::Medley(TEAM_MEDLEY)),
+            "FREESTYLE" | "FR" => Ok(Self::Single(Stroke::FreeStyle)),
+            "BUTTERFLY" | "BU" => Ok(Self::Single(Stroke::Butterfly)),
+            "BACKSTROKE" | "RY" => Ok(Self::Single(Stroke::BackStroke)),
+            "BREASTSTROKE" | "BR" => Ok(Self::Single(Stroke::BreastStroke)),
+            "INDIVIDUALMEDLEY" | "IM" => Ok(Self::Medley(INDIVIDUAL_MEDLEY)), // this string is present for handicapped individual medley relays as well as regular medley relays
+            "MEDLEYRELAY" | "LM" => Ok(Self::Medley(TEAM_MEDLEY)),
             _ => Err(Error::Unknown),
         }
     }

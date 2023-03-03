@@ -1,7 +1,6 @@
+use super::gender_group::GenderGroup;
 use datetime::Year;
 use serde::Deserialize;
-
-use super::gender_group::GenderGroup;
 
 /// Simple person struct
 #[derive(Debug, Deserialize)]

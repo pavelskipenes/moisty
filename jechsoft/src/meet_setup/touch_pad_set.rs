@@ -14,8 +14,7 @@ impl<'de> Deserialize<'de> for TouchPadSet {
         match s.as_str() {
             "ONE SET" => Ok(Self::OneSet),
             string => Err(serde::de::Error::custom(format!(
-                "Could not decode {} as TouchPadSet type",
-                string
+                "Could not decode {string} as TouchPadSet type"
             ))),
         }
     }

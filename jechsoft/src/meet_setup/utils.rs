@@ -19,7 +19,7 @@ pub fn get_meet_list(date: DateTime<Local>) -> Result<Vec<MeetInfo>, Box<dyn Err
     let meets_url = "http://medley.no/tidsjekk/stevneoppsett.asmx/VisStevneoppsett?FraNr=1&FraDato="
         .to_owned() + &date.format("%Y%m%d").to_string();
 
-    let response = reqwest::blocking::get(&meets_url)?.text()?;
+    let response = reqwest::blocking::get(meets_url)?.text()?;
 
     let tmp: Entries = from_str(&response)?;
 
@@ -61,7 +61,7 @@ pub fn download(meet_infos: Vec<MeetInfo>) {
             };
 
             // create a file
-            let mut meet_config_file = match File::create(&meet_path) {
+            let mut meet_config_file = match File::create(meet_path) {
                 Ok(file) => file,
                 Err(why) => {
                     eprintln!("[ERROR]: [{}] {}", &meet_info.name, why);

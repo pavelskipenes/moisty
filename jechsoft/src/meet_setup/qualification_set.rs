@@ -1,6 +1,5 @@
-use serde::Deserialize;
-
 use super::qualification::Qualification;
+use serde::Deserialize;
 
 /// Qualification set contains a list of qualification for enrollment.
 /// `Athlete`s that does not have a valid `TimeResult` for the meet cannot

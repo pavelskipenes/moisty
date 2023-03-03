@@ -32,8 +32,7 @@ impl<'de> Deserialize<'de> for Sorting {
             "FINALTIMEAGEGROUP" => Ok(Self::FinalTimeAgeGroup),
             "FINALAGEGROUPTIMESPLITYF" => Ok(Self::FinalAgeGroupTimeSplitYF),
             string => Err(serde::de::Error::custom(format!(
-                "Could not decode {} as Sorting type",
-                string
+                "Could not decode {string} as Sorting type"
             ))),
         }
     }

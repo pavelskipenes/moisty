@@ -1,8 +1,7 @@
+use super::{error::Error, handicap::Handicap, junior::Junior};
 use chrono::{Datelike, Local};
 use datetime::Year;
 use serde::Deserialize;
-
-use super::{error::Error, handicap::Handicap, junior::Junior};
 
 /// Each Athlete is a member of one class. Athletes that are in the same Class compete against each other. `Athlete`s cannot compete against each other across `Class`es An Athlete can be a member of only one `Class`. `Athlete`s `Class` is dependent on his/her age.
 /// > TODO: Athletes might maybe be members of multiple `Handicap` `Class`es. Needs confirmation.
@@ -18,14 +17,18 @@ pub enum Class {
 }
 
 impl Class {
-    pub fn get_class_group(&self, meet_year: Year) -> Result<Junior, Error> {
+    /// Extract a Junior out of a class
+    /// # Errors
+    /// - returns `Error::NotAJuniorAge` if `self` is not in valid `Junior` range.
+    /// - returns `Error::TeamRelaysDoesNotHaveJuniorClassGroup` if `self` is a junior team without
+    /// a class year.
+    /// - returns `Error::NotAJuniorVariant` if `self` is not a Junior variant.
+    pub fn get_class_group(self, meet_year: Year) -> Result<Junior, Error> {
         let meet_year = meet_year.abs();
         if let Self::Junior(year) = self {
             year.map_or(Err(Error::TeamRelaysDoesNotHaveJuniorClassGroup), |year| {
-                match Junior::try_from(meet_year.abs_diff(year.abs())) {
-                    Ok(junior_class) => Ok(junior_class),
-                    Err(_) => Err(Error::NotAJuniorAge),
-                }
+                Junior::try_from(meet_year.abs_diff(year.abs()))
+                    .map_or(Err(Error::NotAJuniorAge), Ok)
             })
         } else {
             Err(Error::NotAJuniorVariant)
@@ -64,9 +67,14 @@ impl<'de> Deserialize<'de> for Class {
                 }
                 '0'..='9' => {
                     // might be a valid year
-                    match deserialized_value.parse::<i64>() {
-                        // TODO: make sure the created year is within reasonable range
-                        Ok(year) => {
+                    deserialized_value.parse::<i64>().map_or_else(
+                        |_parse_error| {
+                            Err(serde::de::Error::invalid_value(
+                                serde::de::Unexpected::Str(&deserialized_value),
+                                &EXPECTED,
+                            ))
+                        },
+                        |year| {
                             let year = Year(year);
                             if year.abs_diff(Local::now().year().into()) > 100 {
                                 Err(serde::de::Error::invalid_value(
@@ -76,12 +84,8 @@ impl<'de> Deserialize<'de> for Class {
                             } else {
                                 Ok(Self::Junior(Some(year)))
                             }
-                        }
-                        Err(_) => Err(serde::de::Error::invalid_value(
-                            serde::de::Unexpected::Str(&deserialized_value),
-                            &EXPECTED,
-                        )),
-                    }
+                        },
+                    )
                 }
                 _ => Err(serde::de::Error::invalid_value(
                     serde::de::Unexpected::Str(&deserialized_value),

@@ -1,6 +1,5 @@
-use std::fmt;
-
 use serde::Deserialize;
+use std::fmt;
 
 #[derive(Debug)]
 #[allow(dead_code)]
@@ -28,8 +27,7 @@ impl<'de> Deserialize<'de> for Round {
             "PRELIMINARY" => Ok(Self::Preliminary),
             "UNDEFINED" => Ok(Self::Undefined),
             string => Err(serde::de::Error::custom(format!(
-                "Could not decode {} as Round type",
-                string
+                "Could not decode {string} as Round type"
             ))),
         }
     }

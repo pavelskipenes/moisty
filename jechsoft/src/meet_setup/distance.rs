@@ -1,7 +1,6 @@
+use super::error::Error;
 use serde::Deserialize;
 use std::fmt;
-
-use super::error::Error;
 
 /// Distance in meters.
 #[derive(Debug, Clone)]
@@ -16,8 +15,10 @@ impl fmt::Display for Distance {
         match f.align() {
             // Need to split up self into team and individual. self.to_string() will recursively call this function,
             None => match self {
-                Self::Team(team) => write!(f, "{}", team),
-                Self::Individual(individual) => write!(f, "{}", individual),
+                Self::Team(team) => write!(f, "{team}"),
+                Self::Individual(individual) => {
+                    write!(f, "{individual}")
+                }
             },
             Some(_) => f.pad(&self.to_string()),
         }
@@ -26,6 +27,7 @@ impl fmt::Display for Distance {
 
 impl Distance {
     /// Returns true if current Distance is allowed in official meets
+    #[must_use]
     pub fn is_official(&self) -> bool {
         match self {
             Self::Team(team) => matches!(
@@ -140,7 +142,7 @@ impl TryFrom<isize> for Individual {
 impl fmt::Display for Individual {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match f.align() {
-            None => write!(f, "{}m", self.clone() as u16),
+            None => write!(f, "{self}m"),
             Some(_) => f.pad(&self.to_string()),
         }
     }

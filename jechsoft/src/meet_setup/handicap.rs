@@ -45,7 +45,7 @@ impl Display for Error {
         match f.align() {
             Some(_) => f.pad(&self.to_string()),
             None => match self {
-                Self::ParseIntError(error) => write!(f, "{}", error),
+                Self::ParseIntError(error) => write!(f, "{error}"),
                 Self::InvalidHandicapStyleGroup => write!(f, "invalid style group"),
             },
         }
@@ -66,7 +66,7 @@ impl Handicap {
             StyleGroup::BreastStroke => "breaststroke",
             StyleGroup::Medley => "medley",
         };
-        format!("{} in {}", disability_type, styles)
+        format!("{disability_type} in {styles}")
     }
 
     pub fn from_str(str_input: &str) -> Result<Self, Error> {

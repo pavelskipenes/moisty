@@ -1,5 +1,3 @@
-use std::{fs::File, io::BufReader, path::Path};
-
 use super::{
     australian_world_record::{AustralianRank, AustralianWorldRecord},
     award::Award,
@@ -19,6 +17,7 @@ use reqwest::Url;
 use serde::Deserialize;
 use serde_email::Email;
 use std::error::Error;
+use std::{fs::File, io::BufReader, path::Path};
 
 /// `MeetConfig` is a rust structure that represents `meetsetup.xml` file from Jechsoft Victoria.
 /// This file seems to be a simple settings dump from the application.
