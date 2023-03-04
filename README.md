@@ -1,6 +1,6 @@
 # moisty
 
-moisty is a hobby project / library that aims to implement different tools used in swimming. It varies from device drivers to file parsers. For development you'll need nightly version of the rust compiler.
+moisty is a hobby project / library that aims to implement different tools used in swimming. It varies from device drivers to file parsers.
 
 # TODO
 
@@ -13,3 +13,11 @@ moisty is a hobby project / library that aims to implement different tools used 
 - [ ] parse `meetresult.xml`. This file contains meet results.
 - [ ] parse `uni_p.txt`. This file contains meet enrollment information
 - [ ] parse `tryggivann.csv` exports.
+
+# Contribing
+1. use rust nighlty
+2. add this to `.gitconfig` to ignore changes made to `Cargo.lock` in `git diff`
+```.gitconfig
+[diff "generated"]
+	command = true
+```
