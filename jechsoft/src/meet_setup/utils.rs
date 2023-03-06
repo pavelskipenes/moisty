@@ -26,14 +26,14 @@ pub fn get_meet_list(date: DateTime<Local>) -> Result<Vec<MeetInfo>, Box<dyn Err
     Ok(tmp.meet_setup_entries)
 }
 
-/// Download all `meetsetup.xml` files into `meets/` directory.
+/// Download all `meetsetup.xml` files into `assets/meets/` directory.
 /// Skips meet on error and prints the error message to `stderr`.
 pub fn download_meets(meet_infos: Vec<MeetInfo>) {
     let web_client = reqwest::blocking::Client::new();
     for meet_info in meet_infos {
         // calculate the path
         let mut meet_config_path_string = String::new();
-        meet_config_path_string.push_str("meets/");
+        meet_config_path_string.push_str("assets/meets/");
         meet_config_path_string.push_str(&meet_info.name);
         let mut meet_config_path_string = meet_config_path_string.replace(' ', &'_'.to_string());
         meet_config_path_string.push_str(".xml");

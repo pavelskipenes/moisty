@@ -7,7 +7,7 @@ use std::io;
 use std::{fs, path::Path};
 
 fn main() -> io::Result<()> {
-    let meets_dir = Path::new("meets");
+    let meets_dir = Path::new("assets/meets");
 
     fs::create_dir_all(meets_dir)?;
 
