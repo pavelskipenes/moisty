@@ -54,66 +54,67 @@ pub enum Error {
     Unknown,
 }
 
-fn str_to_duration(input: &str) -> Result<Duration, Error> {
-    let mut split = input.split(&[':', '.'][..]);
-    let decomposed_duration = split
-        .next_chunk::<3>()
-        .map_err(|_| Error::Unknown)?
-        .map(|val| val.parse::<u64>().ok());
+// fn str_to_duration(input: &str) -> Result<Duration, Error> {
+//     let mut split = input.split(&[':', '.'][..]);
+//     let decomposed_duration = split
+//         .next_chunk::<3>()
+//         .map_err(|_| Error::Unknown)?
+//         .map(|val| val.parse::<u64>().ok());
+//
+//     match decomposed_duration {
+//         [Some(minutes), Some(seconds), Some(deciseconds)] => Ok(Duration::from_millis(
+//             deciseconds * 10 + seconds * 1000 + minutes * 60 * 1000,
+//         )),
+//         _ => Err(Error::Unknown),
+//     }
+// }
 
-    match decomposed_duration {
-        [Some(minutes), Some(seconds), Some(deciseconds)] => Ok(Duration::from_millis(
-            deciseconds * 10 + seconds * 1000 + minutes * 60 * 1000,
-        )),
-        _ => Err(Error::Unknown),
-    }
-}
-
-pub fn deserialize_csv(input: &str) -> Result<(String, Vec<EnrollmentEntry>), Error> {
-    let mut entries = Vec::new();
-    let club_name: String = input.lines().take(1).collect();
-
-    for (line_number, line) in input.lines().enumerate().skip(1) {
-        let mut fields = line.split(',');
-
-        entries.push(EnrollmentEntry {
-            event_number: fields
-                .next()
-                .ok_or(Error::Missing(Field::EventNumber))?
-                .parse::<u8>()
-                .map_err(|parse_int_error| Error::Parse(Field::EventNumber, parse_int_error))?,
-
-            distance: Distance::try_from(
-                fields
-                    .next()
-                    .ok_or(Error::Missing)
-                    .map_err(|_| Error::Unknown)?,
-            )
-            .map_err(|_| Error::Unknown)?,
-
-            style: Style::try_from(
-                fields
-                    .next()
-                    .ok_or(Error::Missing)
-                    .map_err(|_| Error::Unknown)?,
-            )
-            .map_err(|_| Error::Unknown)?,
-            name: format!("{} {}", fields.next().unwrap(), fields.next().unwrap()),
-            // skip 1
-            gender_group: todo!(),
-            gender_class: todo!(),
-            // class
-            // year
-            enrollment_time: str_to_duration(fields.next().unwrap()).map_err(|_| Error::Unknown)?,
-
-            pool_length: match fields.next() {
-                Some("K") => PoolLength::PoolLength25,
-                Some("L") => PoolLength::PoolLength50,
-                _ => Err(Error::Unrecognized(Field::PoolLength))?,
-            },
-            enrollment_variant: todo!(),
-        });
-    }
-
-    Ok((club_name, entries))
-}
+// /// `uni_p.txt` deserializer
+// pub fn deserialize_csv(input: &str) -> Result<(String, Vec<EnrollmentEntry>), Error> {
+//     let mut entries = Vec::new();
+//     let club_name: String = input.lines().take(1).collect();
+//
+//     for (line_number, line) in input.lines().enumerate().skip(1) {
+//         let mut fields = line.split(',');
+//
+//         entries.push(EnrollmentEntry {
+//             event_number: fields
+//                 .next()
+//                 .ok_or(Error::Missing(Field::EventNumber))?
+//                 .parse::<u8>()
+//                 .map_err(|parse_int_error| Error::Parse(Field::EventNumber, parse_int_error))?,
+//
+//             distance: Distance::try_from(
+//                 fields
+//                     .next()
+//                     .ok_or(Error::Missing)
+//                     .map_err(|_| Error::Unknown)?,
+//             )
+//             .map_err(|_| Error::Unknown)?,
+//
+//             style: Style::try_from(
+//                 fields
+//                     .next()
+//                     .ok_or(Error::Missing)
+//                     .map_err(|_| Error::Unknown)?,
+//             )
+//             .map_err(|_| Error::Unknown)?,
+//             name: format!("{} {}", fields.next().unwrap(), fields.next().unwrap()),
+//             // skip 1
+//             gender_group: todo!(),
+//             gender_class: todo!(),
+//             // class
+//             // year
+//             enrollment_time: str_to_duration(fields.next().unwrap()).map_err(|_| Error::Unknown)?,
+//
+//             pool_length: match fields.next() {
+//                 Some("K") => PoolLength::PoolLength25,
+//                 Some("L") => PoolLength::PoolLength50,
+//                 _ => Err(Error::Unrecognized(Field::PoolLength))?,
+//             },
+//             enrollment_variant: todo!(),
+//         });
+//     }
+//
+//     Ok((club_name, entries))
+// }

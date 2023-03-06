@@ -5,6 +5,8 @@ use std::fmt::{Display, Formatter};
 /// Competition types
 #[derive(Debug)]
 pub enum CompetitionType {
+    /// Meet for mentally disabled athletes. See `Class::(style_group: Handicap{StyleGroup::FreestyleBackstrokeButterfly, dissability_type: 14})`
+    MentallyDisabledMeet = 3,
     /// International championship
     International = 5,
     /// Unofficial meet
@@ -13,7 +15,13 @@ pub enum CompetitionType {
     NorwegianChampionship = 8,
     /// Local or regional meet without qualifications for athletes over 9 years of age.
     RegionalWithoutQualification = 15,
+    /// Regional Age Class Meet / LÅMØ
+    RegionalAgeGroupMeet = 16,
+    // AgeClassChampionship / ÅM
+    // AgeClassChempionship = todo!(),
+    NonNorwegianMeet = 19,
 }
+const EXPECTED_DESERIALIZER_INPUT: [&str; 7]= ["3", "5", "6", "8", "15", "16", "19"];
 
 #[allow(clippy::recursive_format_impl)]
 impl Display for CompetitionType {
@@ -22,9 +30,13 @@ impl Display for CompetitionType {
             // Need to split up self into team and individual. self.to_string() will recursively call this function,
             Some(_) => f.pad(&self.to_string()),
             None => match self {
+                Self::MentallyDisabledMeet => write!(f, "meet for mentally disabled athletes"),
                 Self::International => write!(f, "international championship"),
                 Self::Unofficial => write!(f, "unofficial"),
-                Self::NorwegianChampionship => write!(f, "norwegian championship"),
+                Self::NorwegianChampionship => write!(f, "Norwegian championship"),
+                Self::RegionalAgeGroupMeet => write!(f, "regional age group meet"),
+                Self::NonNorwegianMeet => write!(f, "non Norwegian meet"),
+                // Self::AgeClassChempionship => write!(f, "age class championship"),
                 Self::RegionalWithoutQualification => {
                     write!(f, "regional without qualifications")
                 }
@@ -38,10 +50,14 @@ impl TryFrom<u8> for CompetitionType {
 
     fn try_from(value: u8) -> Result<Self, Self::Error> {
         match value {
+            3 => Ok(Self::MentallyDisabledMeet),
             5 => Ok(Self::International),
             6 => Ok(Self::Unofficial),
             8 => Ok(Self::NorwegianChampionship),
             15 => Ok(Self::RegionalWithoutQualification),
+            16 => Ok(Self::RegionalAgeGroupMeet),
+            19 => Ok(Self::NonNorwegianMeet),
+            // ?? => Ok(Self::AgeClassChempionship),
             _ => Err(Error::CompetitionTypeIdDoesNotExists),
         }
     }
@@ -66,7 +82,7 @@ impl<'de> Deserialize<'de> for CompetitionType {
             |_| {
                 Err(serde::de::Error::unknown_variant(
                     &deserialized_value,
-                    &["DEFAULT", "MEDALS", "NO", "3"],
+                     &EXPECTED_DESERIALIZER_INPUT,
                 ))
             },
             Ok,
@@ -74,13 +90,13 @@ impl<'de> Deserialize<'de> for CompetitionType {
     }
 }
 
-//pub fn deserialize<'de, D>(deserializer: D) -> Result<Option<CompetitionType>, D::Error>
-//where
+// pub fn deserialize<'de, D>(deserializer: D) -> Result<Option<CompetitionType>, D::Error>
+// where
 //    D: serde::de::Deserializer<'de>,
-//{
+// {
 //    const EXPECTED: &str = "one of [5, 6, 8, 15]";
 //    let deserialized_value: String = Deserialize::deserialize(deserializer)?;
-//
+
 //    let number = match deserialized_value.parse::<u8>() {
 //        Ok(number) => number,
 //        Err(err) => {
@@ -90,12 +106,9 @@ impl<'de> Deserialize<'de> for CompetitionType {
 //            ));
 //        }
 //    };
-//
-//    match CompetitionType::from_u8(number) {
-//        Ok(distance) => Ok(Some(distance)),
-//        Err(_) => Err(serde::de::Error::unknown_variant(
+
+//    CompetitionType::try_from(number).map_or_else(|_| Err(serde::de::Error::unknown_variant(
 //            &deserialized_value,
-//            &["DEFAULT", "MEDALS", "NO", "3"],
-//        )),
-//    }
-//}
+//            &EXPECTED_DESERIALIZER_INPUT,
+//        )), |distance| Ok(Some(distance)))
+// }

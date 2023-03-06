@@ -1,1 +1,0 @@
-// TODO: import function into Athelete struct

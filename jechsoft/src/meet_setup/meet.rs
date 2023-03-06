@@ -99,6 +99,9 @@ pub struct Meet {
     #[serde(default, deserialize_with = "deserializer::option_year")]
     pub women_senior: Option<Year>,
 
+    #[serde(default)]
+    pub extra_time_backstroke: Option<u8>,
+
     /// Male athletes born this year or earlier (older athletes) are competing in senior class.
     #[serde(
         default,

@@ -59,6 +59,7 @@ impl TryFrom<&str> for Distance {
             "200" => Ok(Self::Individual(Individual::Distance200)),
             "400" => Ok(Self::Individual(Individual::Distance400)),
             "800" => Ok(Self::Individual(Individual::Distance800)),
+            "1000" => Ok(Self::Team(Team::Distance1000)),
             "1500" => Ok(Self::Individual(Individual::Distance1500)),
             "4*25" => Ok(Self::Team(Team::Distance4x25)),
             "4*50" => Ok(Self::Team(Team::Distance4x50)),
@@ -151,7 +152,7 @@ impl fmt::Display for Individual {
 /// Team distances
 #[derive(Deserialize, Debug, Clone)]
 pub enum Team {
-    /// 4 laps 25 meter per lap
+    /// 4 laps 25 meter per lap. Unnoficial distance
     #[serde(rename = "4*25")]
     Distance4x25,
 
@@ -178,6 +179,11 @@ pub enum Team {
     /// 4 laps 400 meter per lap
     #[serde(rename = "4*400")]
     Distance4x400,
+
+    /// 1000m Unofficial distance.
+    /// consider aliasing "5*4*50"
+    #[serde(rename = "1000")]
+    Distance1000,
 }
 
 impl TryFrom<isize> for Team {
@@ -188,6 +194,7 @@ impl TryFrom<isize> for Team {
             100 => Ok(Self::Distance4x25),
             200 => Ok(Self::Distance4x50),
             300 => Ok(Self::Distance6x50),
+            1000 => Ok(Self::Distance1000),
             400 | 800 => Err(Error::IndistinguishableDistance),
             _ => Err(Error::InvalidDistance),
         }
@@ -206,6 +213,7 @@ impl fmt::Display for Team {
                 Self::Distance8x50 => write!(f, "8*50m"),
                 Self::Distance4x200 => write!(f, "4*200m"),
                 Self::Distance4x400 => write!(f, "4*400m"),
+                Self::Distance1000 => write!(f, "1000m"),
             },
             Some(_) => f.pad(&self.to_string()),
         }
