@@ -4,6 +4,25 @@ use serde::Deserialize;
 pub enum TouchPadSet {
     OneSet,
     TwoSet,
+    None,
+}
+
+#[derive(Debug)]
+pub enum Error {
+    InvalidSet,
+}
+
+impl TryFrom<&str> for TouchPadSet {
+    type Error = Error;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value {
+            "ONE SET" => Ok(Self::OneSet),
+            "TWO SET" => Ok(Self::TwoSet),
+            "NO" => Ok(Self::None),
+            _ => Err(Error::InvalidSet),
+        }
+    }
 }
 
 impl<'de> Deserialize<'de> for TouchPadSet {
@@ -12,16 +31,13 @@ impl<'de> Deserialize<'de> for TouchPadSet {
         D: serde::Deserializer<'de>,
     {
         let s: String = serde::de::Deserialize::deserialize(deserializer)?;
-        // bug: for some reason "TWO SET" is not matching the second arm here.
-        match s.as_str() {
-            "ONE SET" => Ok(Self::OneSet),
-            "TWO SET" => Ok(Self::TwoSet),
-            string => {
-                dbg!(&string);
+        Self::try_from(s.as_str()).map_or_else(
+            |_| {
                 Err(serde::de::Error::custom(format!(
-                    "Could not decode '{string}' as TouchPadSet type"
+                    "Could not decode '{s}' as TouchPadSet type"
                 )))
-            }
-        }
+            },
+            Ok,
+        )
     }
 }

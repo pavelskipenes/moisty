@@ -7,4 +7,5 @@ edition = "2021"
 
 [dependencies]
 chrono = "0.4.23"
+clap = { version = "4.1.8", features = ["derive"] }
 jechsoft = {path="../jechsoft"}

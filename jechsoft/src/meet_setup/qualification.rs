@@ -12,6 +12,7 @@ use std::time::Duration;
 #[serde(rename_all = "PascalCase")]
 pub struct Qualification {
     /// Qualification is valid for this class.
+    #[serde(rename = "Class")]
     pub athlete_class: Class,
 
     /// Qualification applies to this gender.
@@ -19,6 +20,7 @@ pub struct Qualification {
     pub athlete_gender: GenderGroup,
 
     /// Length of the pool of the TimeResult required.
+    #[serde(rename = "PoolLength")]
     pub event_pool_length: PoolLength,
 
     /// Distance of the Event that the qualification applies to

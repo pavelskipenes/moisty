@@ -1,4 +1,4 @@
-use super::{event::Event, session::Session, touch_pad_set::TouchPadSet};
+use super::{event::Event, session::Session};
 use chrono::NaiveDate;
 use datetime::Year;
 use serde::Deserialize;
@@ -108,20 +108,6 @@ where
 
     let duration = minutes * 60 * 1000 + seconds * 1000 + milliseconds * 100;
     Ok(Some(Duration::from_millis(duration)))
-}
-
-pub fn touch_pad_set<'de, D>(deserializer: D) -> Result<Option<TouchPadSet>, D::Error>
-where
-    D: serde::de::Deserializer<'de>,
-{
-    let s: String = serde::de::Deserialize::deserialize(deserializer)?;
-    match s.as_str() {
-        "ONE SET" => Ok(Some(TouchPadSet::OneSet)),
-        "NO" => Ok(None),
-        string => Err(serde::de::Error::custom(format!(
-            "Could not decode {string} as TouchPadSet type"
-        ))),
-    }
 }
 
 pub fn session<'de, D>(deserializer: D) -> Result<Vec<Session>, D::Error>

@@ -1,32 +1,58 @@
 use chrono::Local;
+use clap::Parser;
 use jechsoft::meet_setup::{
     meet::Meet,
     utils::{download_meets, get_meet_list},
 };
-use std::io;
 use std::{fs, path::Path};
+use std::{io, path::PathBuf};
+
+#[derive(Parser)]
+#[command(author, version, about, long_about = None)]
+struct Cli {
+    #[arg(short, long, value_name = "path to meetsetup.xml to parse")]
+    pub meetsetup_path: Option<String>,
+}
 
 fn main() -> io::Result<()> {
-    let meets_dir = Path::new("assets/meets");
+    let cli = Cli::parse();
 
+    let meets_dir = Path::new("assets/meets");
     fs::create_dir_all(meets_dir)?;
 
-    let date = Local::now();
-    match get_meet_list(date) {
-        Ok(meets_to_download) => download_meets(meets_to_download),
-        Err(why) => panic!("{}", why.to_string()),
-    };
+    match cli.meetsetup_path.as_deref() {
+        Some(path) => {
+            // load spesified meet
+            let meetsetup = PathBuf::from(path);
+            match Meet::from(&meetsetup) {
+                Ok(meet) => {
+                    dbg!(&meet);
+                }
+                Err(why) => eprintln!("[ERROR]: [{}] {why}", &meetsetup.as_path().display()),
+            };
+        }
+        None => {
+            // download meets
+            let date = Local::now();
+            match get_meet_list(date) {
+                Ok(meets_to_download) => download_meets(meets_to_download),
+                Err(why) => panic!("{}", why.to_string()),
+            };
 
-    let dir_entries = fs::read_dir(meets_dir)?;
-    for meetsetup_path in dir_entries {
-        let path = meetsetup_path?;
-        let _meet = match Meet::from(&path.path()) {
-            Ok(meet) => meet,
-            Err(why) => {
-                eprintln!("[ERROR]: [{}] {why}", &path.path().display());
-                continue;
+            let dir_entries = fs::read_dir(meets_dir)?;
+            for meetsetup_path in dir_entries {
+                let path = meetsetup_path?;
+                let meet = match Meet::from(&path.path()) {
+                    Ok(meet) => meet,
+                    Err(why) => {
+                        eprintln!("[ERROR]: [{}] {why}", &path.path().display());
+                        continue;
+                    }
+                };
+                dbg!(meet);
             }
-        };
+        }
     }
+
     Ok(())
 }
