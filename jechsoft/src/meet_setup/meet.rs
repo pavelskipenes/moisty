@@ -270,7 +270,7 @@ pub struct Meet {
     #[serde(deserialize_with = "deserializer::bool")]
     pub show_heat_text: bool,
 
-    /// Touch pad configuration.
+    /// Touch pad configuration of the meet.
     #[serde(rename = "Touchpads")]
     pub touch_pads: TouchPadSet,
 

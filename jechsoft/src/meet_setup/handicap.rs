@@ -3,16 +3,24 @@ use std::{fmt::Display, num::ParseIntError};
 
 #[derive(Debug)]
 pub struct Handicap {
-    /// Undocumented field.
+    /// Range of styles this dissability affects.
     pub style_group: StyleGroup,
-    /// Undocumented field.
+    /// Disability type.
+    ///
+    /// 1 - 10 movement disability. Higher number means higher degree of dissability.
+    /// 11 - 13 reduced eye sight up to full blindness. The higher the number the greated sight
+    ///    loss.
+    /// 14 mental dissability.
     pub disability_type: u8,
 }
 
 #[derive(Debug)]
 pub enum StyleGroup {
+    /// Freestyle, Backstroke and Butterfly
     FreestyleBackstrokeButterfly,
+    /// Breast stroke
     BreastStroke,
+    /// Medley
     Medley,
 }
 
@@ -53,6 +61,7 @@ impl Display for Error {
 }
 
 impl Handicap {
+    #[must_use]
     pub fn explain(&self) -> String {
         let disability_type = match self.disability_type {
             1..=10 => "movement and mobility",
@@ -68,21 +77,24 @@ impl Handicap {
         };
         format!("{disability_type} in {styles}")
     }
+}
 
-    pub fn from_str(str_input: &str) -> Result<Self, Error> {
-        let mut starting_index = 2;
-        let style_group = match str_input[0..2].to_ascii_uppercase().as_str() {
-            "SB" => StyleGroup::BreastStroke,
-            "SM" => StyleGroup::Medley,
-            two_char_thingy => {
-                if !two_char_thingy.starts_with('S') {
-                    Err(Error::InvalidHandicapStyleGroup)?;
-                }
-                starting_index = 1;
-                StyleGroup::FreestyleBackstrokeButterfly
-            }
+impl TryFrom<&str> for Handicap {
+    type Error = Error;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        let style_group = match value {
+            x if x.starts_with("SB") => StyleGroup::BreastStroke,
+            x if x.starts_with("SM") => StyleGroup::Medley,
+            x if x.starts_with('S') => StyleGroup::FreestyleBackstrokeButterfly,
+            _ => Err(Error::InvalidHandicapStyleGroup)?,
         };
-        let disability_type = str_input[starting_index..].parse::<u8>()?;
+        let number: String = value
+            .chars()
+            .filter(|character| character.is_numeric())
+            .collect();
+
+        let disability_type = number.parse::<u8>()?;
 
         Ok(Self {
             style_group,
@@ -99,7 +111,7 @@ impl<'de> Deserialize<'de> for Handicap {
         const EXPECTED: &str = "Sx, SMx, SBx where x is a number between 1 and 15";
 
         let deserialized_value: String = Deserialize::deserialize(deserializer)?;
-        Self::from_str(deserialized_value.as_str()).map_err(|err| -> D::Error {
+        Self::try_from(deserialized_value.as_str()).map_err(|err| -> D::Error {
             serde::de::Error::invalid_value(serde::de::Unexpected::Str(&err.to_string()), &EXPECTED)
         })
     }

@@ -55,7 +55,7 @@ impl<'de> Deserialize<'de> for Class {
             None => Err(serde::de::Error::custom("input string too short")),
             Some(first_character) => match first_character {
                 'S' | 's' => {
-                    let handicap = Handicap::from_str(deserialized_value.as_str()).map_err(
+                    let handicap = Handicap::try_from(deserialized_value.as_str()).map_err(
                         |_err| -> D::Error {
                             serde::de::Error::invalid_value(
                                 serde::de::Unexpected::Str(&deserialized_value),

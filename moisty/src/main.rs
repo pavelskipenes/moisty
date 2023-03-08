@@ -1,5 +1,6 @@
 use chrono::Local;
 use clap::Parser;
+use colored::Colorize;
 use jechsoft::meet_setup::{
     meet::Meet,
     utils::{download_meets, get_meet_list},
@@ -42,14 +43,18 @@ fn main() -> io::Result<()> {
             let dir_entries = fs::read_dir(meets_dir)?;
             for meetsetup_path in dir_entries {
                 let path = meetsetup_path?;
-                let meet = match Meet::from(&path.path()) {
+                let _meet = match Meet::from(&path.path()) {
                     Ok(meet) => meet,
                     Err(why) => {
-                        eprintln!("[ERROR]: [{}] {why}", &path.path().display());
+                        eprintln!(
+                            "[{}][{}]: {why}",
+                            "ERROR".red(),
+                            &path.path().to_str().unwrap().green()
+                        );
                         continue;
                     }
                 };
-                dbg!(meet);
+                // dbg!(meet);
             }
         }
     }
