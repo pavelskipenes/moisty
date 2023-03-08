@@ -9,10 +9,11 @@ use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 pub struct DefinedAgeGroups {
-    pub age_groups: Vec<AgeGroup>,
+    pub age_groups: Option<Vec<AgeGroup>>,
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "PascalCase")]
 pub struct AgeGroup {
     pub age_group_name: String,
     #[serde(rename = "$value")]

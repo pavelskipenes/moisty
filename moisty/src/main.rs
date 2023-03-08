@@ -23,7 +23,7 @@ fn main() -> io::Result<()> {
         let _meet = match Meet::from(&path.path()) {
             Ok(meet) => meet,
             Err(why) => {
-                eprintln!("[ERROR]: [{}] {}", &path.path().display(), why);
+                eprintln!("[ERROR]: [{}] {why}", &path.path().display());
                 continue;
             }
         };

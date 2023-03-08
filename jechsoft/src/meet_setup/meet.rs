@@ -1,4 +1,5 @@
 use super::{
+    age_group::DefinedAgeGroups,
     australian_world_record::{AustralianRank, AustralianWorldRecord},
     award::Award,
     competition_type::CompetitionType,
@@ -329,8 +330,9 @@ pub struct Meet {
     #[serde(rename = "EntryManager")]
     pub entry_manager: Option<Person>,
 
-    // #[serde(rename = "DefinedAgeGroups")]
-    // pub age_groups: DefinedAgeGroups,
+    #[serde(default, rename = "DefinedAgeGroups")]
+    pub age_groups: Option<DefinedAgeGroups>,
+
     /// Host representative for managing the meet. Also called "meet leader".
     #[serde(rename = "CompetitionManager")]
     pub competition_manager: Option<Person>,
