@@ -25,6 +25,7 @@ impl<'de> Deserialize<'de> for Round {
             "SEMIFINAL" => Ok(Self::SemiFinal),
             "FINAL" => Ok(Self::Final),
             "PRELIMINARY" => Ok(Self::Preliminary),
+            "QUARTERFINAL" => Ok(Self::QuarterFinal),
             "UNDEFINED" => Ok(Self::Undefined),
             string => Err(serde::de::Error::custom(format!(
                 "Could not decode {string} as Round type"
