@@ -17,13 +17,13 @@ pub enum Class {
 }
 
 impl Class {
-    /// Extract a Junior out of a class
+    /// Try to "unwrap" to a `Junior` variant
     /// # Errors
     /// - returns `Error::NotAJuniorAge` if `self` is not in valid `Junior` range.
     /// - returns `Error::TeamRelaysDoesNotHaveJuniorClassGroup` if `self` is a junior team without
     /// a class year.
-    /// - returns `Error::NotAJuniorVariant` if `self` is not a Junior variant.
-    pub fn get_class_group(self, meet_year: Year) -> Result<Junior, Error> {
+    /// - returns `Error::NotAJuniorVariant` if `self` is not a Junior variant. So either a `Senior` or a `Handicap`
+    pub fn try_into_junior_class(self, meet_year: Year) -> Result<Junior, Error> {
         let meet_year = meet_year.abs();
         if let Self::Junior(year) = self {
             year.map_or(Err(Error::TeamRelaysDoesNotHaveJuniorClassGroup), |year| {
