@@ -1,22 +1,5 @@
 use serde::Deserialize;
-use std::fmt;
-
-#[derive(Deserialize, Debug, PartialEq, Eq)]
-#[serde(rename_all = "UPPERCASE")]
-#[allow(clippy::enum_variant_names)]
-#[allow(clippy::module_name_repetitions)]
-
-/// Stroke
-pub enum Stroke {
-    /// Backstroke.
-    BackStroke,
-    /// Breaststroke.
-    BreastStroke,
-    /// Freestyle.
-    FreeStyle,
-    /// Butterfly.
-    Butterfly,
-}
+use std::fmt::{self, Display};
 
 /// `Style` of the `Event`. A wrapper for `Stroke` to account for `Medley`
 /// which is a list of `Stroke`s.
@@ -54,15 +37,10 @@ impl<'de> Deserialize<'de> for Style {
     }
 }
 
-pub enum Error {
-    Unknown,
-}
-
 impl TryFrom<&str> for Style {
     type Error = Error;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
-        // TODO: add hc medley variant
         match value {
             "FREESTYLE" | "FR" => Ok(Self::Single(Stroke::FreeStyle)),
             "BUTTERFLY" | "BU" => Ok(Self::Single(Stroke::Butterfly)),
@@ -70,25 +48,10 @@ impl TryFrom<&str> for Style {
             "BREASTSTROKE" | "BR" => Ok(Self::Single(Stroke::BreastStroke)),
             "INDIVIDUALMEDLEY" | "IM" => Ok(Self::Medley(INDIVIDUAL_MEDLEY)), // this string is present for handicapped individual medley relays as well as regular medley relays
             "MEDLEYRELAY" | "LM" => Ok(Self::Medley(TEAM_MEDLEY)),
-            _ => Err(Error::Unknown),
+            _ => Err(Error::StyleDoesNotExists),
         }
     }
 }
-/// Individual medley with styles in order
-pub const INDIVIDUAL_MEDLEY: [Stroke; 4] = [
-    Stroke::Butterfly,
-    Stroke::BackStroke,
-    Stroke::BreastStroke,
-    Stroke::FreeStyle,
-];
-
-/// Team medley with it's styles in order
-pub const TEAM_MEDLEY: [Stroke; 4] = [
-    Stroke::BackStroke,
-    Stroke::BreastStroke,
-    Stroke::Butterfly,
-    Stroke::FreeStyle,
-];
 
 // pub const INDIVIDUAL_MEDLEY_HC: [Stroke; 3] =
 //     [Stroke::BackStroke, Stroke::BreastStroke, Stroke::FreeStyle];
@@ -115,6 +78,55 @@ impl fmt::Display for Style {
                 // },
             },
             Some(_) => f.pad(&self.to_string()),
+        }
+    }
+}
+
+/// Stroke
+#[allow(clippy::enum_variant_names)]
+#[allow(clippy::module_name_repetitions)]
+#[derive(Deserialize, Debug, PartialEq, Eq)]
+#[serde(rename_all = "UPPERCASE")]
+pub enum Stroke {
+    /// Backstroke.
+    BackStroke,
+    /// Breaststroke.
+    BreastStroke,
+    /// Freestyle.
+    FreeStyle,
+    /// Butterfly.
+    Butterfly,
+}
+
+/// Individual medley
+pub const INDIVIDUAL_MEDLEY: [Stroke; 4] = [
+    Stroke::Butterfly,
+    Stroke::BackStroke,
+    Stroke::BreastStroke,
+    Stroke::FreeStyle,
+];
+
+/// Team medley
+pub const TEAM_MEDLEY: [Stroke; 4] = [
+    Stroke::BackStroke,
+    Stroke::BreastStroke,
+    Stroke::Butterfly,
+    Stroke::FreeStyle,
+];
+
+#[derive(Debug, thiserror::Error)]
+pub enum Error {
+    StyleDoesNotExists,
+}
+
+#[allow(clippy::recursive_format_impl)]
+impl Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match f.align() {
+            Some(_) => f.pad(&self.to_string()),
+            None => match self {
+                Self::StyleDoesNotExists => write!(f, "style does not exists"),
+            },
         }
     }
 }
