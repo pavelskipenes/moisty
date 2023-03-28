@@ -1,6 +1,6 @@
 use super::{class::Class, gender_group::GenderGroup};
 use serde::Deserialize;
-use std::num::ParseIntError;
+use std::{fmt::Display, num::ParseIntError};
 
 #[derive(Deserialize, Debug)]
 pub struct GenderClass {
@@ -8,20 +8,37 @@ pub struct GenderClass {
     pub class: Class,
 }
 
+#[derive(Debug, thiserror::Error)]
 pub enum Error {
     InvalidClassYearStr(ParseIntError),
     InvalidStrLen,
     InvalidGender,
-    Todo,
 }
-impl std::str::FromStr for GenderClass {
-    type Err = crate::meet_setup::gender_class::Error;
+
+#[allow(clippy::recursive_format_impl)]
+impl Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match f.align() {
+            Some(_) => f.pad(&self.to_string()),
+            None => match self {
+                Self::InvalidClassYearStr(err) => {
+                    write!(f, "invalid class year: {err}")
+                }
+                Self::InvalidStrLen => write!(f, "invalid string length. Expected 3 characters"),
+                Self::InvalidGender => write!(f, "invalid gender character. Expected 'M' | 'K'."),
+            },
+        }
+    }
+}
+
+impl TryFrom<&str> for GenderClass {
+    type Error = Error;
 
     /// # Errors
     /// - returns `Error::InvalidStrLen` if input is not 3 characters long
     /// - returns `Error::InvalidClassYearStr`
     /// - returns `Error::InvalidGender`
-    fn from_str(input: &str) -> Result<Self, Self::Err> {
+    fn try_from(input: &str) -> Result<Self, Self::Error> {
         {
             if input.len() != 3 {
                 return Err(Error::InvalidStrLen);
