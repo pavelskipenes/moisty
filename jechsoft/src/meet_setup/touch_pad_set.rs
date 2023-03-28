@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use serde::Deserialize;
 
 #[derive(Debug)]
@@ -7,11 +9,22 @@ pub enum TouchPadSet {
     None,
 }
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum Error {
-    InvalidSet,
+    UnknownSet,
 }
 
+#[allow(clippy::recursive_format_impl)]
+impl Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match f.align() {
+            Some(_) => f.pad(&self.to_string()),
+            None => match self {
+                Self::UnknownSet => write!(f , "unknown touch pad set"),
+            },
+        }
+    }
+}
 impl TryFrom<&str> for TouchPadSet {
     type Error = Error;
 
@@ -20,7 +33,7 @@ impl TryFrom<&str> for TouchPadSet {
             "ONE SET" => Ok(Self::OneSet),
             "TWO SET" => Ok(Self::TwoSet),
             "NO" => Ok(Self::None),
-            _ => Err(Error::InvalidSet),
+            _ => Err(Error::UnknownSet),
         }
     }
 }
