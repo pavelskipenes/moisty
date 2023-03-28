@@ -9,6 +9,8 @@ pub enum CompetitionType {
     MentallyDisabledMeet = 3,
     /// International championship
     International = 5,
+    /// National meet with athletes from other nations
+    NationalMeetWithAthletesFromForeginNations = 4,
     /// Unofficial meet
     Unofficial = 6,
     /// Norwegian Championship
@@ -35,6 +37,7 @@ impl Display for CompetitionType {
                 Self::Unofficial => write!(f, "unofficial"),
                 Self::NorwegianChampionship => write!(f, "Norwegian championship"),
                 Self::RegionalAgeGroupMeet => write!(f, "regional age group meet"),
+                Self::NationalMeetWithAthletesFromForeginNations => write!(f, "national meet with athletes from foregin nations"),
                 Self::NonNorwegianMeet => write!(f, "non Norwegian meet"),
                 // Self::AgeClassChempionship => write!(f, "age class championship"),
                 Self::RegionalWithoutQualification => {
@@ -51,6 +54,7 @@ impl TryFrom<u8> for CompetitionType {
     fn try_from(value: u8) -> Result<Self, Self::Error> {
         match value {
             3 => Ok(Self::MentallyDisabledMeet),
+            4 => Ok(Self::NationalMeetWithAthletesFromForeginNations),
             5 => Ok(Self::International),
             6 => Ok(Self::Unofficial),
             8 => Ok(Self::NorwegianChampionship),
