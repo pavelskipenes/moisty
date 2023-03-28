@@ -355,11 +355,12 @@ impl Meet {
     /// - `local_xml_file` cannot be opened.
     /// - deserialization fails
 
-    pub fn from(local_xml_file: &Path) -> Result<Self, Box<dyn Error>> {
+    pub fn try_from(local_xml_file: &Path) -> Result<Self, Box<dyn Error>> {
         let file = File::open(local_xml_file)?;
 
         let reader = BufReader::new(file);
 
+        // TODO: convert from shitty windows encoding to normal utf-8
         let jd = &mut serde_xml_rs::de::Deserializer::new_from_reader(reader);
         Ok(serde_path_to_error::deserialize(jd)?)
     }
