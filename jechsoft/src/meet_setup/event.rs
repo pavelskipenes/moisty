@@ -3,6 +3,7 @@ use super::{
     pool_length::PoolLength, round::Round, sorting::Sorting, style::Style,
 };
 use chrono::NaiveDate;
+use gregorian::Year;
 use serde::Deserialize;
 use std::time::Duration;
 
@@ -46,10 +47,10 @@ pub struct Event {
     pub junior_younger: bool,
 
     #[serde(deserialize_with = "deserializer::option_year", default)]
-    pub youngest: Option<datetime::Year>,
+    pub youngest: Option<Year>,
 
     #[serde(deserialize_with = "deserializer::option_year", default)]
-    pub oldest: Option<datetime::Year>,
+    pub oldest: Option<Year>,
 
     pub event_pool_length: PoolLength,
 

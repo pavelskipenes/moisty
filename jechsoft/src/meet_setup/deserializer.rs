@@ -1,6 +1,6 @@
 use super::{event::Event, session::Session};
 use chrono::NaiveDate;
-use datetime::Year;
+use gregorian::Year;
 use serde::Deserialize;
 use std::time::Duration;
 use time::{format_description::FormatItem, macros::format_description, Time};
@@ -66,8 +66,8 @@ where
     D: serde::de::Deserializer<'de>,
 {
     let s: String = Deserialize::deserialize(deserializer)?;
-    match s.parse::<i64>() {
-        Ok(year) => Ok(Some(datetime::Year(year))),
+    match s.parse::<i16>() {
+        Ok(year) => Ok(Some(Year::new(year))),
         Err(err) => Err(serde::de::Error::custom(err.to_string())),
     }
 }
@@ -154,8 +154,8 @@ where
 
     let mut new_vec = vec![];
     for numeric_string in wrapper.core {
-        let year = match numeric_string.parse::<i64>() {
-            Ok(year) => datetime::Year(year),
+        let year = match numeric_string.parse::<i16>() {
+            Ok(year) => Year::new(year),
             Err(why) => Err(serde::de::Error::custom(why.to_string()))?,
         };
 

@@ -1,4 +1,5 @@
 use super::{class::Class, gender_group::GenderGroup};
+use gregorian::Year;
 use serde::Deserialize;
 use std::{fmt::Display, num::ParseIntError};
 
@@ -73,18 +74,18 @@ impl TryFrom<&str> for GenderClass {
 
                     let class_year: String = input.chars().take(2).collect();
                     let class_year = class_year
-                        .parse::<i64>()
+                        .parse::<i16>()
                         .map_err(Error::InvalidClassYearStr)?;
 
                     let gender_character = input.chars().next();
                     match gender_character {
                         Some('M') => Ok(Self {
                             gender_group: GenderGroup::Male,
-                            class: Class::Junior(Some(datetime::Year(class_year))),
+                            class: Class::Junior(Some(Year::new(class_year))),
                         }),
                         Some('K') => Ok(Self {
                             gender_group: GenderGroup::Female,
-                            class: Class::Junior(Some(datetime::Year(class_year))),
+                            class: Class::Junior(Some(Year::new(class_year))),
                         }),
                         _ => Err(Error::InvalidGender),
                     }

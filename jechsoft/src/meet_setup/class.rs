@@ -1,7 +1,7 @@
-use super::handicap::Handicap;
 use chrono::{Datelike, Local};
-use datetime::Year;
+use gregorian::Year;
 use serde::Deserialize;
+use super::handicap::Handicap;
 
 /// Each Athlete is a member of one class. Athletes that are in the same Class compete against each other. `Athlete`s cannot compete against each other across `Class`es An Athlete can be a member of only one `Class`. `Athlete`s `Class` is dependent on his/her age.
 /// > TODO: Athletes might maybe be members of multiple `Handicap` `Class`es. Needs confirmation.
@@ -50,7 +50,7 @@ impl<'de> Deserialize<'de> for Class {
                 }
                 '0'..='9' => {
                     // might be a valid year
-                    deserialized_value.parse::<i64>().map_or_else(
+                    deserialized_value.parse::<i16>().map_or_else(
                         |_parse_error| {
                             Err(serde::de::Error::invalid_value(
                                 serde::de::Unexpected::Str(&deserialized_value),
@@ -58,8 +58,10 @@ impl<'de> Deserialize<'de> for Class {
                             ))
                         },
                         |year| {
-                            let year = Year(year);
-                            if year.abs_diff(Local::now().year().into()) > 100 {
+                            let year = Year::new(year);
+                            let now = Year::new(Local::now().year() as i16);
+
+                            if now.to_number() - year.to_number() > 100 {
                                 Err(serde::de::Error::invalid_value(
                                     serde::de::Unexpected::Str(&deserialized_value),
                                     &EXPECTED,

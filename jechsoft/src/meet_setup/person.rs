@@ -1,5 +1,5 @@
 use super::gender_group::GenderGroup;
-use datetime::Year;
+use gregorian::Year;
 use serde::Deserialize;
 
 /// Simple person struct
@@ -44,8 +44,8 @@ where
         return Ok(None);
     }
 
-    match s.parse::<i64>() {
-        Ok(year) => Ok(Some(Year(year))),
+    match s.parse::<i16>() {
+        Ok(year) => Ok(Some(Year::new(year))),
         Err(why) => Err(serde::de::Error::custom(why.to_string()))?,
     }
 }
