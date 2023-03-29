@@ -7,12 +7,12 @@ use serde::Deserialize;
 //     groups: HashMap<String, HashSet<Year>>,
 // }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct DefinedAgeGroups {
     pub age_groups: Option<Vec<AgeGroup>>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "PascalCase")]
 pub struct AgeGroup {
     pub age_group_name: String,

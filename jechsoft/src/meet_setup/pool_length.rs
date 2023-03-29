@@ -2,7 +2,7 @@ use serde::Deserialize;
 use std::fmt::Display;
 
 /// Length of the pool
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone, Copy)]
 pub enum PoolLength {
     /// 25 meters pool. Often called "short course".
     #[serde(rename = "25")]
@@ -15,6 +15,7 @@ pub enum PoolLength {
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     PoolLengthDoesNotExists,
+    TryFrom(std::num::ParseIntError),
 }
 
 impl TryFrom<u8> for PoolLength {
@@ -33,10 +34,9 @@ impl TryFrom<&str> for PoolLength {
     type Error = Error;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
-        match value {
-            "25" => Ok(Self::PoolLength25),
-            "50" => Ok(Self::PoolLength50),
-            _ => Err(Error::PoolLengthDoesNotExists),
+        match value.parse::<u8>() {
+            Ok(value) => Self::try_from(value),
+            Err(err) => Err(Error::TryFrom(err)),
         }
     }
 }
@@ -55,12 +55,13 @@ impl Display for PoolLength {
 }
 
 #[allow(clippy::recursive_format_impl)]
-impl Display for Error{
+impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match f.align() {
             Some(_) => f.pad(&self.to_string()),
             None => match self {
                 Self::PoolLengthDoesNotExists => write!(f, "pool length does not exists"),
+                Self::TryFrom(parse_err) => write!(f, "TryFrom: {parse_err}"),
             },
         }
     }

@@ -1,7 +1,7 @@
 use serde::Deserialize;
-use std::fmt;
+use std::fmt::{self, Display};
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum Award {
     Default,
     Medals,
@@ -15,16 +15,37 @@ impl<'de> Deserialize<'de> for Award {
         D: serde::Deserializer<'de>,
     {
         let deserialized_value: String = Deserialize::deserialize(deserializer)?;
+        let unknown_variant_error: D::Error = serde::de::Error::unknown_variant(
+            &deserialized_value,
+            &["DEFAULT", "MEDALS", "NO", "3"],
+        );
+        Self::try_from(deserialized_value.as_ref()).map_err(|_| unknown_variant_error)
+    }
+}
 
-        match deserialized_value.as_ref() {
+#[derive(Debug, thiserror::Error, Clone, Copy, Deserialize)]
+pub enum Error {
+    Unknown,
+}
+
+impl Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Unknown => write!(f, "unknown Awards variant"),
+        }
+    }
+}
+
+impl TryFrom<&str> for Award {
+    type Error = Error;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value {
             "3" => Ok(Self::Third),
             "NO" => Ok(Self::None),
             "MEDALS" => Ok(Self::Medals),
             "DEFAULT" => Ok(Self::Default),
-            _ => Err(serde::de::Error::unknown_variant(
-                &deserialized_value,
-                &["DEFAULT", "MEDALS", "NO", "3"],
-            )),
+            _ => Err(Error::Unknown),
         }
     }
 }

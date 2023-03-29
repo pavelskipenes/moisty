@@ -1,4 +1,4 @@
-use super::error::Error;
+use std::fmt::Display;
 
 /// `Athlete`s between 9 and 19 years old gets placed based on their age.
 /// `Athlete`s class is based on their age at the end of the year, the same year as the
@@ -40,28 +40,19 @@ pub enum Junior {
     K = 19,
 }
 
-// cannot implement tryFrom<Year> because class is dependent on the year when the meet
-// is taking place. Assuming inside a function that it's current year will be a bug.
+#[derive(Debug, thiserror::Error, Clone, Copy)]
+pub enum Error{
+    AgeNotJunior,
+}
 
-// TODO: can following stuff be merged together to avoid duplication?
-
-impl TryFrom<u64> for Junior {
-    type Error = Error;
-
-    fn try_from(value: u64) -> Result<Self, Self::Error> {
-        match value {
-            9 => Ok(Self::A),
-            10 => Ok(Self::B),
-            11 => Ok(Self::C),
-            12 => Ok(Self::D),
-            13 => Ok(Self::E),
-            14 => Ok(Self::F),
-            15 => Ok(Self::G),
-            16 => Ok(Self::H),
-            17 => Ok(Self::I),
-            18 => Ok(Self::J),
-            19 => Ok(Self::K),
-            _ => Err(Error::AgeNotJunior),
+#[allow(clippy::recursive_format_impl)]
+impl Display for Error{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match f.align(){
+            Some(_) => f.pad(&self.to_string()),
+            None => match self{
+                Error::AgeNotJunior => write!(f, "can not construct a junior class from an age that is outside junior class"),
+            },
         }
     }
 }

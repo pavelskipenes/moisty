@@ -3,7 +3,7 @@ use std::fmt::{self, Display};
 
 /// `Style` of the `Event`. A wrapper for `Stroke` to account for `Medley`
 /// which is a list of `Stroke`s.
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Style {
     /// Single stroke.
     Single(Stroke),
@@ -85,7 +85,7 @@ impl fmt::Display for Style {
 /// Stroke
 #[allow(clippy::enum_variant_names)]
 #[allow(clippy::module_name_repetitions)]
-#[derive(Deserialize, Debug, PartialEq, Eq)]
+#[derive(Deserialize, Debug, Copy, Clone, PartialEq, Eq)]
 #[serde(rename_all = "UPPERCASE")]
 pub enum Stroke {
     /// Backstroke.
@@ -114,7 +114,7 @@ pub const TEAM_MEDLEY: [Stroke; 4] = [
     Stroke::FreeStyle,
 ];
 
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug, thiserror::Error, Clone, Copy, Deserialize)]
 pub enum Error {
     StyleDoesNotExists,
 }

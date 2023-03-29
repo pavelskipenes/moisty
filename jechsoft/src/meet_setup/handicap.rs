@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use std::{fmt::Display, num::ParseIntError};
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Handicap {
     /// Range of styles this dissability affects.
     pub style_group: StyleGroup,
@@ -14,7 +14,7 @@ pub struct Handicap {
     pub disability_type: u8,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, Deserialize)]
 pub enum StyleGroup {
     /// Freestyle, Backstroke and Butterfly
     FreestyleBackstrokeButterfly,
@@ -24,7 +24,7 @@ pub enum StyleGroup {
     Medley,
 }
 
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug, thiserror::Error, Clone)]
 pub enum Error {
     ParseIntError(#[from] ParseIntError),
     InvalidHandicapStyleGroup,
@@ -62,7 +62,7 @@ impl Display for Error {
 
 impl Handicap {
     #[must_use]
-    pub fn explain(&self) -> String {
+    pub fn explain(self) -> String {
         let disability_type = match self.disability_type {
             1..=10 => "movement and mobility",
             11..=13 => "reduced eye sight or blind",

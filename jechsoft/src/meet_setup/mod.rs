@@ -4,17 +4,18 @@ use self::meet_info::MeetInfo;
 use serde::Deserialize;
 
 mod age_group;
+mod australian_rank;
 mod australian_world_record;
 mod award;
 pub mod class;
 mod competition_type;
 mod deserializer;
 pub mod distance;
-mod error;
 mod event;
 pub mod gender_class;
 pub mod gender_group;
 mod handicap;
+mod individual_distance;
 mod junior;
 pub mod meet;
 mod meet_info;
@@ -27,6 +28,7 @@ mod round;
 mod session;
 mod sorting;
 pub mod style;
+mod team_distance;
 mod touch_pad_set;
 pub mod utils;
 

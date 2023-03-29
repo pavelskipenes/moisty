@@ -1,16 +1,9 @@
 use super::{
-    age_group::DefinedAgeGroups,
-    australian_world_record::{AustralianRank, AustralianWorldRecord},
-    award::Award,
-    competition_type::CompetitionType,
-    deserializer,
-    distance::Distance,
-    event::Event,
-    person::Person,
-    pool_category::PoolCategory,
-    qualification_set::QualificationSet,
-    session::Session,
-    touch_pad_set::TouchPadSet,
+    age_group::DefinedAgeGroups, australian_rank::AustralianRank,
+    australian_world_record::AustralianWorldRecord, award::Award,
+    competition_type::CompetitionType, deserializer, distance::Distance, event::Event,
+    person::Person, pool_category::PoolCategory, qualification_set::QualificationSet,
+    session::Session, touch_pad_set::TouchPadSet,
 };
 use chrono::NaiveDate;
 use datetime::Year;
@@ -299,7 +292,6 @@ pub struct Meet {
 
     #[serde(default)]
     pub other_price3: Option<u16>,
-
 
     #[serde(default)]
     pub other_payment4: Option<String>,

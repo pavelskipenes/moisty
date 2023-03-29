@@ -1,4 +1,4 @@
-use super::{error::Error, handicap::Handicap, junior::Junior};
+use super::handicap::Handicap;
 use chrono::{Datelike, Local};
 use datetime::Year;
 use serde::Deserialize;
@@ -6,7 +6,7 @@ use serde::Deserialize;
 /// Each Athlete is a member of one class. Athletes that are in the same Class compete against each other. `Athlete`s cannot compete against each other across `Class`es An Athlete can be a member of only one `Class`. `Athlete`s `Class` is dependent on his/her age.
 /// > TODO: Athletes might maybe be members of multiple `Handicap` `Class`es. Needs confirmation.
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum Class {
     /// Athletes that is older than 19 years old.
     Senior,
@@ -16,25 +16,8 @@ pub enum Class {
     Handicap(Handicap),
 }
 
-impl Class {
-    /// Try to "unwrap" to a `Junior` variant
-    /// # Errors
-    /// - returns `Error::NotAJuniorAge` if `self` is not in valid `Junior` range.
-    /// - returns `Error::TeamRelaysDoesNotHaveJuniorClassGroup` if `self` is a junior team without
-    /// a class year.
-    /// - returns `Error::NotAJuniorVariant` if `self` is not a Junior variant. So either a `Senior` or a `Handicap`
-    pub fn try_into_junior_class(self, meet_year: Year) -> Result<Junior, Error> {
-        let meet_year = meet_year.abs();
-        if let Self::Junior(year) = self {
-            year.map_or(Err(Error::TeamRelaysDoesNotHaveJuniorClassGroup), |year| {
-                Junior::try_from(meet_year.abs_diff(year.abs()))
-                    .map_or(Err(Error::NotAJuniorAge), Ok)
-            })
-        } else {
-            Err(Error::NotAJuniorVariant)
-        }
-    }
-}
+#[derive(thiserror::Error, Debug, Clone, Copy)]
+pub enum Error {}
 
 impl<'de> Deserialize<'de> for Class {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>

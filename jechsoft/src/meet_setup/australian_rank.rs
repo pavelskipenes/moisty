@@ -1,37 +1,44 @@
-use serde::Deserialize;
 use std::fmt::Display;
+
+use serde::Deserialize;
 
 #[derive(Debug, Deserialize, Copy, Clone)]
 #[serde(rename_all = "UPPERCASE")]
-pub enum AustralianWorldRecord {
-    LongCourse,
-    Same,
+pub enum AustralianRank {
+    Percent,
 }
 
-#[derive(thiserror::Error, Debug, Copy, Clone, Deserialize)]
+#[derive(Debug, thiserror::Error, Deserialize, Copy, Clone)]
 pub enum Error {
     DoesNotExists,
 }
 
-#[allow(clippy::recursive_format_impl)]
 impl Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::DoesNotExists => write!(f, "australian rank does not exists"),
+        }
+    }
+}
+
+#[allow(clippy::recursive_format_impl)]
+impl Display for AustralianRank {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match f.align() {
             Some(_) => f.pad(&self.to_string()),
             None => match self {
-                Self::DoesNotExists => write!(f, "variant does not exists"),
+                Self::Percent => write!(f, "percent"),
             },
         }
     }
 }
 
-impl TryFrom<&str> for AustralianWorldRecord {
+impl TryFrom<&str> for AustralianRank {
     type Error = Error;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         match value {
-            "long course" => Ok(Self::LongCourse),
-            "same" => Ok(Self::Same),
+            "percent" => Ok(Self::Percent),
             _ => Err(Error::DoesNotExists),
         }
     }

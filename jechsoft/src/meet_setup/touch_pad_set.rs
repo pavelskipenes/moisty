@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use serde::Deserialize;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum TouchPadSet {
     OneSet,
     TwoSet,
@@ -20,7 +20,7 @@ impl Display for Error {
         match f.align() {
             Some(_) => f.pad(&self.to_string()),
             None => match self {
-                Self::UnknownSet => write!(f , "unknown touch pad set"),
+                Self::UnknownSet => write!(f, "unknown touch pad set"),
             },
         }
     }
