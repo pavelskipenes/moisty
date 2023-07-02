@@ -3,6 +3,7 @@ use serde::Deserialize;
 #[derive(Debug)]
 pub enum Sorting {
     Alternative,
+    /// Sort with the fastest qualification time in the center of the pool and the last heat.
     Final,
     FinalAgeGroupTime,
     FinalAgeGroupTimeSplitYF,

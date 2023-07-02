@@ -36,7 +36,8 @@ pub struct Qualification {
     pub qualification_time: Duration,
 }
 
-/// Deserializer for Qualification structure
+/// Deserializer for Qualification structure. We need to use a custom deserializer because
+/// `Duration` is not defined in this crate.
 pub fn duration<'de, D>(deserializer: D) -> Result<Duration, D::Error>
 where
     D: serde::de::Deserializer<'de>,

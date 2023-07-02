@@ -48,6 +48,7 @@ impl<'de> Deserialize<'de> for Distance {
         Self::try_from(deserialized_value.as_str()).map_err(|_| deserialize_error)
     }
 }
+
 #[derive(Debug, thiserror::Error, Clone)]
 pub enum Error {
     TryFrom(IndividualError, TeamError),

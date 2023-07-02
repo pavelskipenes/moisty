@@ -73,7 +73,7 @@ impl Display for Error {
         match f.align() {
             Some(_) => f.pad(&self.to_string()),
             None => match self {
-                Self::Convert(parse_error) => write!(f, "convertion error: {parse_error}"),
+                Self::Convert(parse_error) => write!(f, "conversion error: {parse_error}"),
                 Self::InvalidDistance => write!(f, "distance does not exists"),
             },
         }

@@ -25,13 +25,13 @@ impl<'de> Deserialize<'de> for Award {
 
 #[derive(Debug, thiserror::Error, Clone, Copy, Deserialize)]
 pub enum Error {
-    Unknown,
+    UnknownVariant,
 }
 
 impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Unknown => write!(f, "unknown Awards variant"),
+            Self::UnknownVariant => write!(f, "unknown variant"),
         }
     }
 }
@@ -45,7 +45,7 @@ impl TryFrom<&str> for Award {
             "NO" => Ok(Self::None),
             "MEDALS" => Ok(Self::Medals),
             "DEFAULT" => Ok(Self::Default),
-            _ => Err(Error::Unknown),
+            _ => Err(Error::UnknownVariant),
         }
     }
 }

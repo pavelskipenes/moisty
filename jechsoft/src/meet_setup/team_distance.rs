@@ -2,92 +2,71 @@ use serde::Deserialize;
 use std::fmt::{self, Display};
 
 /// Team distances
-/// TODO: add support for laps and distance. This will generalize all team relays.
-/// laps has to be a multiple of 2.
-/// distance has to be an instance of `PoolLenght`.
-#[derive(Deserialize, Debug, Clone, Copy)]
+/// constructed from number of laps as the first argument and distance in the second argument.
+/// Total distance is number of laps multiplied by distance per lap
+#[derive(Debug, Clone, Copy)]
 pub enum Team {
-    /// 4 laps 25 meter per lap. Unnoficial distance
-    #[serde(rename = "4*25")]
-    Distance4x25,
+    /// Distance(laps,Distance)
+    Distance(u8, u16),
+}
 
-    /// 4 laps 50 meter per lap
-    #[serde(rename = "4*50")]
-    Distance4x50,
+impl<'de> Deserialize<'de> for Team {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let expected = "num_laps*total_distance. two numbers separated by a '*' character. example: '2*50', '20*50', '4'100'";
+        let value: String = serde::de::Deserialize::deserialize(deserializer)?;
+        let unexpected = serde::de::Unexpected::Str(value.as_ref());
+        let parse_error: D::Error = serde::de::Error::invalid_value(unexpected, &expected);
 
-    /// 6 laps 50 meter per lap
-    #[serde(rename = "6*50")]
-    Distance6x50,
+        // extract two numbers separated by '*' character
+        let parsed_numbers = value
+            .split('*')
+            .filter_map(|maybe_number| maybe_number.parse::<u16>().ok())
+            .array_chunks::<2>()
+            .next();
 
-    /// 4 laps 100 meter per lap
-    #[serde(rename = "4*100")]
-    Distance4x100,
-
-    /// 8 laps 50 meter per lap
-    #[serde(rename = "8*50")]
-    Distance8x50,
-
-    /// 4 laps 200 meter per lap
-    #[serde(rename = "4*200")]
-    Distance4x200,
-
-    /// 4 laps 400 meter per lap
-    #[serde(rename = "4*400")]
-    Distance4x400,
-
-    /// 1000m Unofficial distance.
-    /// consider aliasing "5*4*50"
-    #[serde(rename = "1000")]
-    Distance1000,
+        match parsed_numbers {
+            Some([num_laps, total_distance]) if num_laps % 2 == 0 && total_distance % 25 == 0 => {
+                Ok(Self::Distance(
+                    num_laps.try_into().map_err(|_| parse_error)?,
+                    total_distance,
+                ))
+            },
+            Some([_,_]) => Err(serde::de::Error::invalid_value(unexpected, &"number of laps has to be a multiple of 2 and distance per lap has to be a multiple of 25")),
+            _ => Err(parse_error),
+        }
+    }
 }
 
 impl TryFrom<isize> for Team {
     type Error = Error;
 
-    fn try_from(value: isize) -> Result<Self, Self::Error> {
-        match value {
-            100 => Ok(Self::Distance4x25),
-            200 => Ok(Self::Distance4x50),
-            300 => Ok(Self::Distance6x50),
-            1000 => Ok(Self::Distance1000),
-            400 | 800 => Err(Error::IndistinguishableDistance),
-            _ => Err(Error::InvalidDistance),
-        }
+    fn try_from(_value: isize) -> Result<Self, Self::Error> {
+        Err(Error::InvalidDistance)
     }
 }
 impl TryFrom<&str> for Team {
     type Error = Error;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
-        match value {
-            "4*25" => Ok(Self::Distance4x25),
-            "4*50" => Ok(Self::Distance4x50),
-            "6*50" => Ok(Self::Distance6x50),
-            "4*100" => Ok(Self::Distance4x100),
-            "8*50" => Ok(Self::Distance8x50),
-            "4*200" => Ok(Self::Distance4x200),
-            "4*400" => Ok(Self::Distance4x400),
-            "1000" => Ok(Self::Distance1000),
-            _ => Err(Error::InvalidDistance),
-        }
-    }
-}
+        let parsed_numbers = value
+            .split('*')
+            .filter_map(|maybe_number| maybe_number.parse::<u16>().ok())
+            .array_chunks::<2>()
+            .next();
 
-#[allow(clippy::recursive_format_impl)]
-impl fmt::Display for Team {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match f.align() {
-            None => match self {
-                Self::Distance4x25 => write!(f, "4*25m"),
-                Self::Distance4x50 => write!(f, "4*50m"),
-                Self::Distance6x50 => write!(f, "6*50m"),
-                Self::Distance4x100 => write!(f, "4*100m"),
-                Self::Distance8x50 => write!(f, "8*50m"),
-                Self::Distance4x200 => write!(f, "4*200m"),
-                Self::Distance4x400 => write!(f, "4*400m"),
-                Self::Distance1000 => write!(f, "1000m"),
-            },
-            Some(_) => f.pad(&self.to_string()),
+        match parsed_numbers {
+            Some([num_laps, total_distance]) if num_laps % 2 == 0 && total_distance % 25 == 0 => {
+                Ok(Self::Distance(
+                    num_laps.try_into().unwrap(),
+                    // .try_into()
+                    // .map_err(|convert_error| Error::Convert(convert_error))?,
+                    total_distance,
+                ))
+            }
+            Some([_, _]) | None => Err(Error::InvalidDistance),
         }
     }
 }
@@ -99,6 +78,16 @@ pub enum Error {
     InvalidDistance,
 }
 
+// #[allow(clippy::recursive_format_impl)]
+// impl fmt::Display for Team {
+//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//         match f.align() {
+//             None => match self {
+//             },
+//             Some(_) => f.pad(&self.to_string()),
+//         }
+//     }
+// }
 #[allow(clippy::recursive_format_impl)]
 impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -106,9 +95,9 @@ impl Display for Error {
             Some(_) => f.pad(&self.to_string()),
             None => match self {
                 Self::IndistinguishableDistance => {
-                    write!(f, "cannot uniquly identify the distance")
+                    write!(f, "cannot uniquely identify the distance")
                 }
-                Self::Convert(parse_error) => write!(f, "convertion error: {parse_error}"),
+                Self::Convert(parse_error) => write!(f, "conversion error: {parse_error}"),
                 Self::InvalidDistance => write!(f, "distance does not exists"),
             },
         }

@@ -1,5 +1,4 @@
 //! Parser for `meet_setup.xml` file
-
 use self::meet_info::MeetInfo;
 use serde::Deserialize;
 

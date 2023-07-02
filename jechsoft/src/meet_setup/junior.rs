@@ -51,7 +51,7 @@ impl Display for Error{
         match f.align(){
             Some(_) => f.pad(&self.to_string()),
             None => match self{
-                Error::AgeNotJunior => write!(f, "can not construct a junior class from an age that is outside junior class"),
+                Self::AgeNotJunior => write!(f, "can not construct a junior class from an age that is outside junior class"),
             },
         }
     }

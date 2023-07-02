@@ -4,9 +4,9 @@ use crate::meet_setup::{
     pool_length::PoolLength, style::Style,
 };
 use serde::Deserialize;
-use std::{num::ParseIntError, time::Duration};
+use std::{fmt::Display, num::ParseIntError, time::Duration};
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct EnrollmentEntry {
     pub event_number: u8,
     pub distance: Distance,
@@ -19,23 +19,24 @@ pub struct EnrollmentEntry {
     pub enrollment_variant: EnrollmentVariant,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub enum EnrollmentVariant {
     Individual(EnrollmentIndividual),
     Relay(EnrollmentRelay),
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct EnrollmentIndividual {
     pub name: String,
     pub surname: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct EnrollmentRelay {
     pub team_name: String,
 }
 
+#[derive(Debug, Clone, Copy, Deserialize)]
 pub enum Field {
     EventNumber,
     Distance,
@@ -43,6 +44,22 @@ pub enum Field {
     PoolLength,
 }
 
+#[allow(clippy::recursive_format_impl)]
+impl Display for Field {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match f.align() {
+            Some(_) => f.pad(&self.to_string()),
+            None => match self {
+                Self::EventNumber => write!(f, "event number"),
+                Self::Distance => write!(f, "distance"),
+                Self::Duration => write!(f, "duration"),
+                Self::PoolLength => write!(f, "pool length"),
+            },
+        }
+    }
+}
+
+#[derive(Debug, thiserror::Error)]
 pub enum Error {
     // TODO: add line number in the error output
     // TODO: add &str of what input we were trying to parse
@@ -50,10 +67,21 @@ pub enum Error {
     Missing(Field),
     Unrecognized(Field),
     Parse(Field, ParseIntError),
-    // I'm too lazy to fix error mappings just yet
-    Unknown,
 }
 
+#[allow(clippy::recursive_format_impl)]
+impl Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match f.align() {
+            Some(_) => f.pad(&self.to_string()),
+            None => match self {
+                Self::Missing(field) => write!(f, "missing field: {field}"),
+                Self::Unrecognized(field) => write!(f, "unrecognized field: {field}"),
+                Self::Parse(field, err) => write!(f, "parse error on field: {field}. {err}"),
+            },
+        }
+    }
+}
 // fn str_to_duration(input: &str) -> Result<Duration, Error> {
 //     let mut split = input.split(&[':', '.'][..]);
 //     let decomposed_duration = split
@@ -101,8 +129,8 @@ pub enum Error {
 //             .map_err(|_| Error::Unknown)?,
 //             name: format!("{} {}", fields.next().unwrap(), fields.next().unwrap()),
 //             // skip 1
-//             gender_group: todo!(),
-//             gender_class: todo!(),
+//             gender_group: write!(f, ""),
+//             gender_class: write!(f, ""),
 //             // class
 //             // year
 //             enrollment_time: str_to_duration(fields.next().unwrap()).map_err(|_| Error::Unknown)?,
@@ -112,7 +140,7 @@ pub enum Error {
 //                 Some("L") => PoolLength::PoolLength50,
 //                 _ => Err(Error::Unrecognized(Field::PoolLength))?,
 //             },
-//             enrollment_variant: todo!(),
+//             enrollment_variant: write!(f, ""),
 //         });
 //     }
 //
