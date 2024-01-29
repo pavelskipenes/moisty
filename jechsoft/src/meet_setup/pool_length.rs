@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use std::fmt::Display;
+use std::{fmt::Display, convert::TryFrom};
 
 /// Length of the pool
 #[derive(Deserialize, Debug, Clone, Copy)]

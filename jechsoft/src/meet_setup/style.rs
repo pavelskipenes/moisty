@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use std::fmt::{self, Display};
+use std::{fmt::{self, Display}, convert::TryFrom};
 
 /// `Style` of the `Event`. A wrapper for `Stroke` to account for `Medley`
 /// which is a list of `Stroke`s.

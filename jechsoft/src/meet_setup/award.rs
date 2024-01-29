@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use std::fmt::{self, Display};
+use std::{fmt::{self, Display}, convert::TryFrom};
 
 #[derive(Debug, Copy, Clone)]
 pub enum Award {

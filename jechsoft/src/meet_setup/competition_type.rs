@@ -1,5 +1,8 @@
 use serde::Deserialize;
-use std::fmt::{Display, Formatter};
+use std::{
+    convert::TryFrom,
+    fmt::{Display, Formatter},
+};
 
 /// Competition types
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -20,6 +23,10 @@ pub enum CompetitionType {
     RegionalAgeGroupMeet = 16,
     // AgeClassChampionship / ÅM
     // AgeClassChempionship = todo!(),
+    //
+    /// "Krets/Regionstevne"
+    DistrictRegionalMeet = 18,
+
     NonNorwegianMeet = 19,
 }
 
@@ -43,6 +50,7 @@ impl Display for CompetitionType {
                 Self::RegionalWithoutQualification => {
                     write!(f, "regional without qualifications")
                 }
+                Self::DistrictRegionalMeet => write!(f, "district / regional meet"),
             },
         }
     }
@@ -77,6 +85,7 @@ impl TryFrom<u8> for CompetitionType {
             8 => Ok(Self::NorwegianChampionship),
             15 => Ok(Self::RegionalWithoutQualification),
             16 => Ok(Self::RegionalAgeGroupMeet),
+            18 => Ok(Self::DistrictRegionalMeet),
             19 => Ok(Self::NonNorwegianMeet),
             // ?? => Ok(Self::AgeClassChempionship),
             _ => Err(Error::CompetitionTypeIdDoesNotExists),
@@ -100,7 +109,8 @@ impl<'de> Deserialize<'de> for CompetitionType {
     where
         D: serde::Deserializer<'de>,
     {
-        const EXPECTED_DESERIALIZER_INPUT: [&str; 8] = ["3", "4", "5", "6", "8", "15", "16", "19"];
+        const EXPECTED_DESERIALIZER_INPUT: [&str; 9] =
+            ["3", "4", "5", "6", "8", "15", "16", "18", "19"];
 
         let deserialized_value: String = Deserialize::deserialize(deserializer)?;
         let parse_error: D::Error =

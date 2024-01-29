@@ -1,9 +1,13 @@
+extern crate chrono;
+extern crate gregorian;
+extern crate serde;
+extern crate time;
+use self::chrono::NaiveDate;
+use self::gregorian::Year;
+use self::time::{format_description::FormatItem, macros::format_description, Time};
 use super::{event::Event, session::Session};
-use chrono::NaiveDate;
-use gregorian::Year;
 use serde::Deserialize;
 use std::time::Duration;
-use time::{format_description::FormatItem, macros::format_description, Time};
 
 pub fn bool<'de, D>(deserializer: D) -> Result<bool, D::Error>
 where
@@ -80,6 +84,12 @@ where
     const FORMAT: &[FormatItem] = format_description!("[hour][minute]");
 
     let deserialized_string: String = Deserialize::deserialize(deserializer)?;
+
+    if deserialized_string.is_empty() {
+        return Err(serde::de::Error::custom(format!(
+            "received an empty string, expected {EXPECTED}"
+        )));
+    }
     let result = Time::parse(&deserialized_string, &FORMAT).map_err(|err| -> D::Error {
         serde::de::Error::invalid_value(serde::de::Unexpected::Str(&err.to_string()), &EXPECTED)
     })?;

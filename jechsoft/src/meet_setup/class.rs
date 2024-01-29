@@ -1,7 +1,12 @@
-use super::handicap::Handicap;
-use chrono::{Datelike, Local};
-use gregorian::Year;
+use std::convert::TryInto;
+use meet_setup::class::chrono::Datelike;
+use std::convert::TryFrom;
+extern crate chrono;
+extern crate gregorian;
+use self::chrono::Local;
+use self::gregorian::Year;
 use serde::Deserialize;
+use super::handicap::Handicap;
 
 /// Each Athlete is a member of one class. Athletes that are in the same Class compete against each other. `Athlete`s cannot compete against each other across `Class`es An Athlete can be a member of only one `Class`. `Athlete`s `Class` is dependent on his/her age.
 /// > TODO: Athletes might maybe be members of multiple `Handicap` `Class`es. Needs confirmation.
@@ -26,7 +31,6 @@ impl<'de> Deserialize<'de> for Class {
     {
         const EXPECTED: &str = "'SR' | 'Sx' | 'SMx' | 'SBx' | 'JR' where x is a number between 1 and 15 or a four digit number representing a year not further away than 100 years from current year";
         let deserialized_value: String = Deserialize::deserialize(deserializer)?;
-        
         // TODO: D::Error does not implement clone so this shit needs to be created explicitly.
         let error: D::Error = serde::de::Error::invalid_value(
             serde::de::Unexpected::Str(&deserialized_value),

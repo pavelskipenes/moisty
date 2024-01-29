@@ -1,3 +1,7 @@
+extern crate chrono;
+extern crate clap;
+extern crate colored;
+extern crate jechsoft;
 use chrono::Local;
 use clap::Parser;
 use colored::Colorize;
@@ -5,7 +9,7 @@ use jechsoft::meet_setup::{
     meet::Meet,
     utils::{download_meets, get_meet_list},
 };
-use std::{fs, iter::once, path::Path};
+use std::{fs, path::Path};
 use std::{io, path::PathBuf};
 
 #[derive(Parser)]
@@ -31,6 +35,8 @@ fn main() -> io::Result<()> {
 
     // download only those we don't have
     if cli.download {
+        // how do we know if there has been any updates? Do they need to be redownloaded each time?
+        // invalidate the files if they are older than X hours?
         let date = Local::now();
         match get_meet_list(date) {
             Ok(meets_to_download) => download_meets(meets_to_download),
@@ -38,35 +44,42 @@ fn main() -> io::Result<()> {
         };
     }
 
-    // this mess tries to return an iterator over files in a directory. If the user passes a file explicitly this should return an iterator also. That would make the next block simpler as it can take in an iterator of files, no matter if there are one or many entries.
-    let meets = match cli.meetsetup_path.as_deref() {
+    let meets = match cli.meetsetup_path {
         Some(path_meetsetup_file) => {
-            // return file wrapped inside an iterator to match the signature of the next return block
-            Box::new(once(PathBuf::from(path_meetsetup_file))) as Box<dyn Iterator<Item = PathBuf>>
+            vec![PathBuf::from(path_meetsetup_file)]
         }
-        None => {
-            let files = fs::read_dir(meets_dir)?
-                .filter_map(Result::ok)
-                .filter(|entry| entry.path().is_file())
-                .map(|entry| entry.path())
-                .collect::<Vec<_>>();
-            Box::new(files.into_iter()) as Box<dyn Iterator<Item = PathBuf>>
-        }
+        None => fs::read_dir(meets_dir)?
+            .filter_map(Result::ok)
+            .filter(|entry| entry.path().is_file())
+            .map(|entry| entry.path())
+            .collect::<Vec<_>>(),
     };
 
-    for file in meets {
-        let _meet = match Meet::try_from(&file) {
+    let mut error_count = 0;
+    for meet_setup_file in &meets {
+        let _meet = match Meet::try_from(meet_setup_file) {
             Ok(meet) => meet,
             Err(why) => {
                 eprintln!(
                     "[{}][{}]: {why}",
                     "ERROR".red(),
-                    &file.file_name().unwrap().to_string_lossy().green()
+                    &meet_setup_file
+                        .file_name()
+                        .unwrap()
+                        .to_string_lossy()
+                        .green()
                 );
+                error_count += 1;
                 continue;
             }
         };
         // dbg!(_meet);
     }
+    println!(
+        "[{}]: {}/{} successfully meet files parsed",
+        "INFO".green(),
+        meets.len() - error_count,
+        meets.len()
+    );
     Ok(())
 }

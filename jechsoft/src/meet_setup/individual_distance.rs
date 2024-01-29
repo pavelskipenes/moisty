@@ -1,6 +1,7 @@
-use core::fmt;
+extern crate core;
+use self::core::fmt;
 use serde::Deserialize;
-use std::fmt::Display;
+use std::{convert::TryFrom, fmt::Display};
 
 /// Individual distances
 /// TODO: add support for adjustable distance. Distance has to be a multiple of `PoolLength`.

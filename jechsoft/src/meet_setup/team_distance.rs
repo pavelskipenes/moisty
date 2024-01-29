@@ -1,5 +1,8 @@
 use serde::Deserialize;
-use std::fmt::{self, Display};
+use std::{
+    convert::{TryFrom, TryInto},
+    fmt::{self, Display},
+};
 
 /// Team distances
 /// constructed from number of laps as the first argument and distance in the second argument.

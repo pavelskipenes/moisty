@@ -1,6 +1,8 @@
 use super::{meet_info::MeetInfo, Entries};
-use chrono::{DateTime, Local};
-use serde_xml_rs::from_str;
+extern crate chrono;
+extern crate serde_xml_rs;
+use self::chrono::{DateTime, Local};
+use self::serde_xml_rs::from_str;
 use std::error::Error;
 use std::fs::File;
 use std::io::Write;

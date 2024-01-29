@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use std::{fmt::Display, num::ParseIntError};
+use std::{fmt::Display, num::ParseIntError, convert::TryFrom};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Handicap {

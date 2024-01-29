@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use std::fmt::Display;
+use std::{fmt::Display, convert::TryFrom};
 
 #[derive(Debug, Deserialize, Copy, Clone)]
 #[serde(rename_all = "UPPERCASE")]

@@ -5,11 +5,17 @@ use super::{
     person::Person, pool_category::PoolCategory, qualification_set::QualificationSet,
     session::Session, touch_pad_set::TouchPadSet,
 };
-use chrono::NaiveDate;
-use gregorian::Year;
-use reqwest::Url;
-use serde::Deserialize;
-use serde_email::Email;
+extern crate chrono;
+extern crate gregorian;
+extern crate reqwest;
+extern crate serde;
+extern crate serde_email;
+
+use self::chrono::NaiveDate;
+use self::gregorian::Year;
+use self::reqwest::Url;
+use self::serde::Deserialize;
+use self::serde_email::Email;
 use std::error::Error;
 use std::{fs::File, io::BufReader, path::Path};
 
@@ -214,6 +220,18 @@ pub struct Meet {
         deserialize_with = "deserializer::option_bool"
     )]
     pub general_hc: Option<bool>,
+
+    #[serde(default, rename = "PoolLengthStartHeat")]
+    pub pool_length_start_heat: Option<String>,
+
+    #[serde(default, rename = "LCMEntrytimes")]
+    pub lcm_entry_times: Option<String>,
+
+    #[serde(default, rename = "SCMEntrytimesIfLCMDoesNotExist")]
+    pub scm_entry_times_if_lcm_does_not_exists: Option<String>,
+
+    #[serde(default, rename = "SortLCMBeforeSCM")]
+    pub sort_lcm_before_scm: Option<String>,
 
     #[serde(default, deserialize_with = "deserializer::option_bool")]
     pub general_masters: Option<bool>,

@@ -1,9 +1,12 @@
+extern crate chrono;
+extern crate gregorian;
+extern crate serde;
+use self::chrono::NaiveDate;
+use self::gregorian::Year;
 use super::{
     award::Award, deserializer, distance::Distance, gender_group::GenderGroup,
     pool_length::PoolLength, round::Round, sorting::Sorting, style::Style,
 };
-use chrono::NaiveDate;
-use gregorian::Year;
 use serde::Deserialize;
 use std::time::Duration;
 

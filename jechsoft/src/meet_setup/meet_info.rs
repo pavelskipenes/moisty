@@ -1,6 +1,10 @@
+extern crate chrono;
+extern crate reqwest;
+extern crate serde;
+
+use self::chrono::NaiveDate;
+use self::reqwest::Url;
 use super::deserializer;
-use chrono::NaiveDate;
-use reqwest::Url;
 use serde::Deserialize;
 
 /// Meet info structure parses output from a url endpoint used by `JechSoft Victoria`
@@ -17,7 +21,7 @@ pub struct MeetInfo {
     #[serde(rename = "fradato", deserialize_with = "deserializer::date")]
     pub date_start: NaiveDate,
 
-    /// Ending date of the meet
+    /// Last date of the meet
     #[serde(rename = "tildato", deserialize_with = "deserializer::date")]
     pub date_end: NaiveDate,
 

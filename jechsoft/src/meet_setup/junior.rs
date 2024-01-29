@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::{fmt::Display, convert::TryFrom};
 
 /// `Athlete`s between 9 and 19 years old gets placed based on their age.
 /// `Athlete`s class is based on their age at the end of the year, the same year as the

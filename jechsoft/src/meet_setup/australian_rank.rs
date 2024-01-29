@@ -1,5 +1,4 @@
-use std::fmt::Display;
-
+use std::{convert::TryFrom, fmt::Display};
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize, Copy, Clone)]
