@@ -12,6 +12,18 @@ pub enum Distance {
     Team(Team),
 }
 
+#[allow(clippy::recursive_format_impl)]
+impl Display for Distance {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match f.align() {
+            Some(_) => f.pad(&self.to_string()),
+            None => match self {
+                Self::Individual(individual) => f.write_str(&individual.to_string()),
+                Self::Team(team) => f.write_str(&team.to_string()),
+            },
+        }
+    }
+}
 impl TryFrom<&str> for Distance {
     type Error = Error;
     fn try_from(value: &str) -> Result<Self, Self::Error> {

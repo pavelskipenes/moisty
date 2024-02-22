@@ -52,12 +52,22 @@ impl TryFrom<&str> for Individual {
         Self::try_from(parsed_number)
     }
 }
+
 #[allow(clippy::recursive_format_impl)]
 impl fmt::Display for Individual {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match f.align() {
-            None => write!(f, "{self}m"),
             Some(_) => f.pad(&self.to_string()),
+            None => match self {
+                Self::Distance25 => write!(f, "25"),
+                Self::Distance50 => write!(f, "50"),
+                Self::Distance100 => write!(f, "100"),
+                Self::Distance150 => write!(f, "150"),
+                Self::Distance200 => write!(f, "200"),
+                Self::Distance400 => write!(f, "400"),
+                Self::Distance800 => write!(f, "800"),
+                Self::Distance1500 => write!(f, "1500"),
+            },
         }
     }
 }

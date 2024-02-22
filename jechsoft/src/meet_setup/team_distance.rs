@@ -81,16 +81,18 @@ pub enum Error {
     InvalidDistance,
 }
 
-// #[allow(clippy::recursive_format_impl)]
-// impl fmt::Display for Team {
-//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-//         match f.align() {
-//             None => match self {
-//             },
-//             Some(_) => f.pad(&self.to_string()),
-//         }
-//     }
-// }
+#[allow(clippy::recursive_format_impl)]
+impl fmt::Display for Team {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match f.align() {
+            Some(_) => f.pad(&self.to_string()),
+            None => match self {
+                Self::Distance(laps, distance) => write!(f, "{laps}x{distance}m"),
+            },
+        }
+    }
+}
+
 #[allow(clippy::recursive_format_impl)]
 impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

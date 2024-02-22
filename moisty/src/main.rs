@@ -24,6 +24,14 @@ struct Cli {
         default_value_t = false
     )]
     pub download: bool,
+
+    #[arg(
+        short,
+        long,
+        value_name = "print short info about each event in the meet",
+        default_value_t = false
+    )]
+    pub info: bool,
 }
 
 fn main() -> io::Result<()> {
@@ -57,7 +65,7 @@ fn main() -> io::Result<()> {
 
     let mut error_count = 0;
     for meet_setup_file in &meets {
-        let _meet = match Meet::try_from(meet_setup_file) {
+        let meet = match Meet::try_from(meet_setup_file) {
             Ok(meet) => meet,
             Err(why) => {
                 eprintln!(
@@ -73,7 +81,19 @@ fn main() -> io::Result<()> {
                 continue;
             }
         };
-        // dbg!(_meet);
+
+        if cli.info {
+            println!("id\tdistance\tstyle\tgender_group\tdate\tdescription");
+            for event in meet.events {
+                let id = event.id;
+                let description = event.description;
+                let distance = event.distance;
+                let style = event.style;
+                let gender_group = event.gender_group;
+                let date = event.date;
+                println!("{id}\t{distance}\t{style}\t{gender_group}\t{date}\t{description}");
+            }
+        }
     }
     println!(
         "[{}]: {}/{} successfully meet files parsed",
