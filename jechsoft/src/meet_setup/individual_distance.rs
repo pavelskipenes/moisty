@@ -59,14 +59,14 @@ impl fmt::Display for Individual {
         match f.align() {
             Some(_) => f.pad(&self.to_string()),
             None => match self {
-                Self::Distance25 => write!(f, "25"),
-                Self::Distance50 => write!(f, "50"),
-                Self::Distance100 => write!(f, "100"),
-                Self::Distance150 => write!(f, "150"),
-                Self::Distance200 => write!(f, "200"),
-                Self::Distance400 => write!(f, "400"),
-                Self::Distance800 => write!(f, "800"),
-                Self::Distance1500 => write!(f, "1500"),
+                Self::Distance25 => write!(f, "25m"),
+                Self::Distance50 => write!(f, "50m"),
+                Self::Distance100 => write!(f, "100m"),
+                Self::Distance150 => write!(f, "150m"),
+                Self::Distance200 => write!(f, "200m"),
+                Self::Distance400 => write!(f, "400m"),
+                Self::Distance800 => write!(f, "800m"),
+                Self::Distance1500 => write!(f, "1500m"),
             },
         }
     }

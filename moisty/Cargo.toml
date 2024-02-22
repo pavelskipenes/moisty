@@ -8,4 +8,6 @@ version = "0.1.0"
 chrono = "0.4.23"
 clap = { version = "4.1.8", features = ["derive"] }
 colored = "2.0.0"
+directories = "5.0.1"
 jechsoft = {path="../jechsoft"}
+tabled = "0.15.0"

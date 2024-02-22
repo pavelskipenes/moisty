@@ -2,6 +2,42 @@
 
 moisty is a hobby project / library that aims to implement different tools used in swimming. It varies from device drivers to file parsers. For now it only parses `meetsetup.xml` files which looks to be a save dump of JechSoft Victoria. By having the parser implemented it ended up being a pretty decent validator for those files because the original software does not perform such checks as strictly.
 
+## Examples
+
+Get registered events from a `meetsetup.xml` file:
+
+```
+~/Repositories/Personal/moisty> cargo run -- -i -m `~/Repositories/Meets/2024/Atlantic Race/Approbert/Stevneoppsett/meetsetup.xml`
+    Finished dev [unoptimized + debuginfo] target(s) in 0.10s
+     Running `target/debug/moisty -i -m '/home/pavel/Repositories/Meets/2024/Atlantic Race/Approbert/Stevneoppsett/meetset
+up.xml'`
+╭────┬──────────┬───────────────────┬──────────────┬────────────╮
+│ id │ distance │ style             │ gender_group │ date       │
+├────┼──────────┼───────────────────┼──────────────┼────────────┤
+│ 1  │ 100m     │ butterfly         │ female       │ 2024-03-02 │
+│ 2  │ 100m     │ butterfly         │ male         │ 2024-03-02 │
+│ 3  │ 50m      │ freestyle         │ female       │ 2024-03-02 │
+│ 4  │ 50m      │ freestyle         │ male         │ 2024-03-02 │
+│ 5  │ 100m     │ backstroke        │ female       │ 2024-03-02 │
+│ 6  │ 100m     │ backstroke        │ male         │ 2024-03-02 │
+│ 7  │ 50m      │ breaststroke      │ female       │ 2024-03-02 │
+│ 8  │ 50m      │ breaststroke      │ male         │ 2024-03-02 │
+│ 9  │ 100m     │ individual medley │ female       │ 2024-03-02 │
+│ 10 │ 100m     │ individual medley │ male         │ 2024-03-02 │
+│ 11 │ 100m     │ freestyle         │ female       │ 2024-03-02 │
+│ 12 │ 100m     │ freestyle         │ male         │ 2024-03-02 │
+│ 13 │ 50m      │ backstroke        │ female       │ 2024-03-02 │
+│ 14 │ 50m      │ backstroke        │ male         │ 2024-03-02 │
+│ 15 │ 50m      │ butterfly         │ female       │ 2024-03-02 │
+│ 16 │ 50m      │ butterfly         │ male         │ 2024-03-02 │
+│ 17 │ 100m     │ breaststroke      │ female       │ 2024-03-02 │
+│ 18 │ 100m     │ breaststroke      │ male         │ 2024-03-02 │
+│ 19 │ 4x50m    │ freestyle         │ mixed        │ 2024-03-02 │
+╰────┴──────────┴───────────────────┴──────────────┴────────────╯
+[INFO]: 1/1 successfully meet files parsed
+
+```
+
 ## TODO
 
 ### jechsoft
@@ -17,9 +53,9 @@ moisty is a hobby project / library that aims to implement different tools used 
 
 If you are bored feel free to tweak on this as well.
 
-- use rust nighlty
-- download some meets of the internet `cargo run -cargo run -- --download`
-- `cargo run` will run in `/moisty/src/main.rs` which will just try to parse every file in `/assets/meets/*.xml`
+- use rust nighlty.
+- download some meets of the internet `cargo run -cargo run -- --download`. It will save them in your users cache directory.
+- `cargo run` will run in `/moisty/src/main.rs` which will try to parse every file in `CACHE_DIR/meets/*.xml`.
 - this will cause some parsing errors like this:
 
 ```

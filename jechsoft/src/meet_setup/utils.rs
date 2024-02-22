@@ -4,7 +4,7 @@ extern crate serde_xml_rs;
 use self::chrono::{DateTime, Local};
 use self::serde_xml_rs::from_str;
 use std::error::Error;
-use std::fs::File;
+use std::fs::{self, File};
 use std::io::Write;
 use std::path::Path;
 
@@ -28,54 +28,69 @@ pub fn get_meet_list(date: DateTime<Local>) -> Result<Vec<MeetInfo>, Box<dyn Err
     Ok(tmp.meet_setup_entries)
 }
 
-/// Download all `meetsetup.xml` files into `assets/meets/` directory.
+/// generate a filename for a meet from it's name
+fn meet_filename(meet: &MeetInfo) -> String {
+    meet.name.replace(' ', "_").to_lowercase()
+}
+
+/// Download all `meetsetup.xml` files into specified directory.
 /// Skips meet on error and prints the error message to `stderr`.
-pub fn download_meets(meet_infos: Vec<MeetInfo>) {
+/// # Panics
+/// will panic when `meets_directory` doesn't exist and cannot be created
+pub fn download_meets(meets_directory: &Path, meet_infos: Vec<MeetInfo>) {
+    if !meets_directory.exists() {
+        fs::create_dir_all(meets_directory).expect("could not create requested directory");
+    }
     let web_client = reqwest::blocking::Client::new();
     for meet_info in meet_infos {
-        // calculate the path
-        let mut meet_config_path_string = String::new();
-        meet_config_path_string.push_str("assets/meets/");
-        meet_config_path_string.push_str(&meet_info.name);
-        let mut meet_config_path_string = meet_config_path_string.replace(' ', &'_'.to_string());
-        meet_config_path_string.push_str(".xml");
-        let meet_config_path_string = meet_config_path_string.to_lowercase();
+        let meet_path = meets_directory.join(meet_filename(&meet_info));
 
-        let meet_path = Path::new(&meet_config_path_string);
-
-        if !meet_path.exists() {
-            // file needs to be downloaded
-
-            // fetch the remote config
-            let response = match web_client.get(meet_info.config_xml).send() {
-                Ok(response) => response,
-                Err(why) => {
-                    eprintln!("[ERROR]: [{}] {}", &meet_info.name, why);
-                    continue;
-                }
-            };
-            let meet_config_decoded = match response.text_with_charset("ISO-8859-1") {
-                Ok(string) => string,
-                Err(why) => {
-                    eprintln!("[ERROR]: [{}] {}", &meet_info.name, why);
-                    continue;
-                }
-            };
-
-            // create a file
-            let mut meet_config_file = match File::create(meet_path) {
-                Ok(file) => file,
-                Err(why) => {
-                    eprintln!("[ERROR]: [{}] {}", &meet_info.name, why);
-                    continue;
-                }
-            };
-
-            // write decoded string into file
-            if let Err(why) = write!(&mut meet_config_file, "{}", &meet_config_decoded) {
-                eprintln!("[ERROR]: [{}] {}", &meet_info.name, why);
+        let (meet_config_decoded, mut meet_config_file) = match fs::try_exists(&meet_path) {
+            Err(err) => {
+                // could not check existance of the file. Means we also will not be able to save it
+                // there probably
+                panic!("{}", err.to_string());
+            }
+            Ok(true) => {
+                println!(
+                    "[INFO]: skipping {} beacuse it already exists in the cache directory",
+                    meet_info.name
+                );
                 continue;
-            };
-        }
+            }
+            Ok(false) => {
+                // fetch the remote config
+                let response = match web_client.get(meet_info.config_xml).send() {
+                    Ok(response) => response,
+                    Err(why) => {
+                        eprintln!("[ERROR]: [{}] {}", &meet_info.name, why);
+                        continue;
+                    }
+                };
+                let meet_config_decoded = match response.text_with_charset("ISO-8859-1") {
+                    Ok(string) => string,
+                    Err(why) => {
+                        eprintln!("[ERROR]: [{}] {}", &meet_info.name, why);
+                        continue;
+                    }
+                };
+
+                // create a file
+                let meet_config_file = match File::create(&meet_path) {
+                    Ok(file) => file,
+                    Err(why) => {
+                        eprintln!("[ERROR]: [{}] {}", &meet_info.name, why);
+                        continue;
+                    }
+                };
+                (meet_config_decoded, meet_config_file)
+            }
+        };
+
+        // write decoded string into file
+        if let Err(why) = write!(&mut meet_config_file, "{}", &meet_config_decoded) {
+            eprintln!("[ERROR]: [{}] {}", &meet_info.name, why);
+            continue;
+        };
     }
 }

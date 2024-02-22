@@ -1,16 +1,21 @@
 extern crate chrono;
 extern crate clap;
 extern crate colored;
+extern crate directories;
 extern crate jechsoft;
+extern crate tabled;
+
 use chrono::Local;
 use clap::Parser;
 use colored::Colorize;
+use directories::BaseDirs;
 use jechsoft::meet_setup::{
     meet::Meet,
     utils::{download_meets, get_meet_list},
 };
-use std::{fs, path::Path};
+use std::fs;
 use std::{io, path::PathBuf};
+use tabled::{builder::Builder, settings::Style};
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -37,17 +42,20 @@ struct Cli {
 fn main() -> io::Result<()> {
     let cli = Cli::parse();
 
-    // create meets directory
-    let meets_dir = Path::new("assets/meets");
-    fs::create_dir_all(meets_dir)?;
+    let base_dir = BaseDirs::new();
+    let meets_dir = match base_dir {
+        Some(base_dir) => base_dir.cache_dir().join("moisty/meets"),
+        None => todo!("cannot deal with system without configured cache directory"),
+    };
 
-    // download only those we don't have
+    fs::create_dir_all(&meets_dir)?;
+
     if cli.download {
         // how do we know if there has been any updates? Do they need to be redownloaded each time?
         // invalidate the files if they are older than X hours?
         let date = Local::now();
         match get_meet_list(date) {
-            Ok(meets_to_download) => download_meets(meets_to_download),
+            Ok(meets_to_download) => download_meets(&meets_dir, meets_to_download),
             Err(why) => eprintln!("{}", why),
         };
     }
@@ -83,16 +91,28 @@ fn main() -> io::Result<()> {
         };
 
         if cli.info {
-            println!("id\tdistance\tstyle\tgender_group\tdate\tdescription");
+            let mut builder = Builder::default();
+            builder.push_record([
+                "id",
+                "distance",
+                "style",
+                "gender_group",
+                "date",
+                //"description",
+            ]);
             for event in meet.events {
-                let id = event.id;
-                let description = event.description;
-                let distance = event.distance;
-                let style = event.style;
-                let gender_group = event.gender_group;
-                let date = event.date;
-                println!("{id}\t{distance}\t{style}\t{gender_group}\t{date}\t{description}");
+                let row = [
+                    event.id.to_string(),
+                    event.distance.to_string(),
+                    event.style.to_string(),
+                    event.gender_group.to_string(),
+                    event.date.to_string(),
+                    //event.description.to_string(),
+                ];
+                builder.push_record(row);
             }
+            let table = builder.build().with(Style::rounded()).to_string();
+            println!("{table}");
         }
     }
     println!(
