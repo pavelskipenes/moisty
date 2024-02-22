@@ -317,6 +317,30 @@ pub struct Meet {
     #[serde(default)]
     pub other_price4: Option<u16>,
 
+    #[serde(default)]
+    pub other_payment5: Option<String>,
+
+    #[serde(default)]
+    pub other_price5: Option<u16>,
+
+    #[serde(default)]
+    pub other_payment6: Option<String>,
+
+    #[serde(default)]
+    pub other_price6: Option<u16>,
+
+    #[serde(default)]
+    pub other_payment7: Option<String>,
+
+    #[serde(default)]
+    pub other_price7: Option<u16>,
+
+    #[serde(default)]
+    pub other_payment8: Option<String>,
+
+    #[serde(default)]
+    pub other_price8: Option<u16>,
+
     #[serde(deserialize_with = "deserializer::bool")]
     pub write_date_time: bool,
 
