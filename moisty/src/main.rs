@@ -20,8 +20,11 @@ use tabled::{builder::Builder, settings::Style};
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 struct Cli {
+    /// Path to meetsetup file
     #[arg(short, long, value_name = "path to `meetsetup.xml` to parse")]
     pub meetsetup_path: Option<String>,
+
+    /// Download latest meets from medley.no
     #[arg(
         short,
         long,
@@ -30,6 +33,7 @@ struct Cli {
     )]
     pub download: bool,
 
+    /// Output table of events from meets
     #[arg(
         short,
         long,
@@ -37,6 +41,15 @@ struct Cli {
         default_value_t = false
     )]
     pub info: bool,
+
+    /// clear out cache directory of saved meets
+    #[arg(
+        short,
+        long,
+        value_name = "clear cached meets",
+        default_value_t = false
+    )]
+    pub clear_cache: bool,
 }
 
 fn main() -> io::Result<()> {
@@ -48,8 +61,11 @@ fn main() -> io::Result<()> {
         None => todo!("cannot deal with system without configured cache directory"),
     };
 
-    fs::create_dir_all(&meets_dir)?;
+    if cli.clear_cache {
+        fs::remove_dir_all(&meets_dir)?;
+    }
 
+    fs::create_dir_all(&meets_dir)?;
     if cli.download {
         // how do we know if there has been any updates? Do they need to be redownloaded each time?
         // invalidate the files if they are older than X hours?
@@ -91,14 +107,21 @@ fn main() -> io::Result<()> {
         };
 
         if cli.info {
+            let mut header_builder = Builder::default();
+            header_builder.push_record::<&[String; 3]>(&[
+                "Meet name".into(),
+                "Date".into(),
+                "Sessions".into(),
+            ]);
+            header_builder.push_record(&[meet.name, meet.date, meet.sessions.len().to_string()]);
+            let mut table = header_builder.build();
+            table.with(Style::rounded());
+            println!("{}", table.to_string());
+
             let mut builder = Builder::default();
             builder.push_record([
-                "id",
-                "distance",
-                "style",
-                "gender_group",
-                "date",
-                //"description",
+                "Event", "Distance", "Style", "Gender", "Date",
+                //"Description",
             ]);
             for event in meet.events {
                 let row = [
