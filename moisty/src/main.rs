@@ -108,12 +108,21 @@ fn main() -> io::Result<()> {
 
         if cli.info {
             let mut header_builder = Builder::default();
-            header_builder.push_record::<&[String; 3]>(&[
+            header_builder.push_record::<&[String; 4]>(&[
                 "Meet name".into(),
                 "Date".into(),
                 "Sessions".into(),
+                "NSF id".into(),
             ]);
-            header_builder.push_record(&[meet.name, meet.date, meet.sessions.len().to_string()]);
+            header_builder.push_record(&[
+                meet.name,
+                meet.date,
+                meet.sessions.len().to_string(),
+                match meet.nsf_meet_id {
+                    Some(nsf_meet_id) => format!("{:0>10}", nsf_meet_id),
+                    None => "".to_string(),
+                },
+            ]);
             let mut table = header_builder.build();
             table.with(Style::rounded());
             println!("{}", table.to_string());
