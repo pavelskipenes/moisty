@@ -4,11 +4,16 @@ extern crate serde;
 extern crate time;
 use self::chrono::NaiveDate;
 use self::gregorian::Year;
+use self::serde::Deserialize;
 use self::time::{format_description::FormatItem, macros::format_description, Time};
 use super::{event::Event, session::Session};
-use serde::Deserialize;
 use std::time::Duration;
 
+/// # Returns
+/// returns `Ok(true)` if the input is "TRUE" and `Ok(false)` if the input is "FALSE"
+///
+/// # Errors
+/// Returns an error if string is not "TRUE" or "FALSE"
 pub fn bool<'de, D>(deserializer: D) -> Result<bool, D::Error>
 where
     D: serde::de::Deserializer<'de>,
@@ -22,6 +27,13 @@ where
     }
 }
 
+/// # Returns
+/// returns `Some(true)` if the input is "TRUE"
+/// returns `Some(false)` if the input is "FALSE"
+/// returns `None` if no input were given
+///
+/// # Errors
+/// Returns an error if input is neither "TRUE" or "FALSE"
 pub fn option_bool<'de, D>(deserializer: D) -> Result<Option<bool>, D::Error>
 where
     D: serde::de::Deserializer<'de>,
@@ -40,6 +52,17 @@ where
     )
 }
 
+/// # Returns
+/// Will return `None` if the parsed string is empty.
+/// Will return a `Ok(NaiveDate)` if the date is parsed successfully.
+///
+/// # Errors
+/// This deserializer will return an error if a date does not follow the epected jechsoft format.
+/// Expected input is a string of 8 characters in total. Allowed characters are only numbers
+/// 0-9. The first four digits needs to represent a full Gregorian year with leading
+/// zeroes. The next two digits can be in range 0 - 12 with leading zero representing the month of
+/// the year. The last two digits needs to be day number in the month. Allowed range is between 1
+/// and 31 inclusive and with leading zeroes.
 pub fn option_date<'de, D>(deserializer: D) -> Result<Option<NaiveDate>, D::Error>
 where
     D: serde::de::Deserializer<'de>,
@@ -54,6 +77,13 @@ where
     }
 }
 
+/// # Errors
+/// This deserializer will return an error if a date does not follow the epected jechsoft format.
+/// Expected input is a string of 8 characters in total. Allowed characters are only numbers
+/// 0-9. The first four digits needs to represent a full Gregorian year with leading
+/// zeroes. The next two digits can be in range 0 - 12 with leading zero representing the month of
+/// the year. The last two digits needs to be day number in the month. Allowed range is between 1
+/// and 31 inclusive and with leading zeroes.
 pub fn date<'de, D>(deserializer: D) -> Result<NaiveDate, D::Error>
 where
     D: serde::de::Deserializer<'de>,
@@ -65,6 +95,8 @@ where
     }
 }
 
+/// # Errors
+/// Will return an error if the desiaralized string cannot be parsed as a date.
 pub fn option_year<'de, D>(deserializer: D) -> Result<Option<Year>, D::Error>
 where
     D: serde::de::Deserializer<'de>,
@@ -76,6 +108,13 @@ where
     }
 }
 
+/// # Time deserielizer
+/// parses text and returns Time of the parsed value is a four character long string containing
+/// only numbers, the first two digits represent the hour of the day and the second pair represents
+/// the minute of the hour. Leading zeroes are required for correct parsing.
+///
+/// # Errors
+/// returns an error if parsing an empty string, and if time cannot be pared as expected
 pub fn time<'de, D>(deserializer: D) -> Result<Time, D::Error>
 where
     D: serde::de::Deserializer<'de>,
@@ -97,6 +136,8 @@ where
     Ok(result)
 }
 
+/// # Errors
+/// returns an error if parsing string to number fails.
 pub fn option_duration<'de, D>(deserializer: D) -> Result<Option<Duration>, D::Error>
 where
     D: serde::de::Deserializer<'de>,
@@ -120,6 +161,8 @@ where
     Ok(Some(Duration::from_millis(duration)))
 }
 
+/// # Errors
+/// returns an error if deserialization fails.
 pub fn session<'de, D>(deserializer: D) -> Result<Vec<Session>, D::Error>
 where
     D: serde::de::Deserializer<'de>,
@@ -135,6 +178,8 @@ where
     Ok(wrapper.sessions)
 }
 
+/// # Errors
+/// returns an error if deserialization fails
 pub fn event<'de, D>(deserializer: D) -> Result<Vec<Event>, D::Error>
 where
     D: serde::de::Deserializer<'de>,
@@ -150,6 +195,10 @@ where
     Ok(wrapper.events)
 }
 
+/// # Errors
+/// returns an error if the input cannot be parsed into a `Year`
+/// # Bugs
+/// possible bug when `OnePriceAllClasses` is empty, which might return Ok(Some([])) instead of Ok(None)
 pub fn one_price_all_class<'de, D>(deserializer: D) -> Result<Option<Vec<Year>>, D::Error>
 where
     D: serde::de::Deserializer<'de>,
@@ -157,13 +206,12 @@ where
     #[derive(Deserialize)]
     struct UselessWrapper {
         #[serde(rename = "OnePriceAllClasses", default)]
-        core: Vec<String>,
+        birth_years: Vec<String>,
     }
 
     let wrapper: UselessWrapper = Deserialize::deserialize(deserializer)?;
-
     let mut new_vec = vec![];
-    for numeric_string in wrapper.core {
+    for numeric_string in wrapper.birth_years {
         let year = match numeric_string.parse::<i16>() {
             Ok(year) => Year::new(year),
             Err(why) => Err(serde::de::Error::custom(why.to_string()))?,

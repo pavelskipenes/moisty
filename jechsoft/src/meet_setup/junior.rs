@@ -1,9 +1,8 @@
-use std::{fmt::Display, convert::TryFrom};
+use std::{convert::TryFrom, fmt::Display};
 
-/// `Athlete`s between 9 and 19 years old gets placed based on their age.
-/// `Athlete`s class is based on their age at the end of the year, the same year as the
-/// meet date. In other words, athletes that are born the same year are competing in the
-/// same class regardless of the date of the meet.
+/// Athletes between 9 and 19 years old gets placed based on their age.
+/// An athlete's class is based on their age at the end of the year, the same year as the
+/// meet date. In other words, athletes birth year is deciding their Junior class.
 #[derive(Debug)]
 pub enum Junior {
     /// 9 years old
@@ -41,17 +40,20 @@ pub enum Junior {
 }
 
 #[derive(Debug, thiserror::Error, Clone, Copy)]
-pub enum Error{
+pub enum Error {
     AgeNotJunior,
 }
 
 #[allow(clippy::recursive_format_impl)]
-impl Display for Error{
+impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match f.align(){
+        match f.align() {
             Some(_) => f.pad(&self.to_string()),
-            None => match self{
-                Self::AgeNotJunior => write!(f, "can not construct a junior class from an age that is outside junior class"),
+            None => match self {
+                Self::AgeNotJunior => write!(
+                    f,
+                    "can not construct a junior class from an age that is outside junior class"
+                ),
             },
         }
     }

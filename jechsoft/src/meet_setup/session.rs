@@ -1,10 +1,10 @@
 extern crate chrono;
 extern crate serde;
 extern crate time;
+use self::chrono::NaiveDate;
+use self::serde::Deserialize;
 use self::time::Time;
 use super::deserializer;
-use self::chrono::NaiveDate;
-use serde::Deserialize;
 
 /// `Session` is a set of continuous `Event`s without a break.
 /// A `Meet` have at least one `Session` and at most one `Session` per `Event`.

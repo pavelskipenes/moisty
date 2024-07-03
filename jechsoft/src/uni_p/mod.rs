@@ -3,7 +3,8 @@ use crate::meet_setup::{
     distance::Distance, gender_class::GenderClass, gender_group::GenderGroup,
     pool_length::PoolLength, style::Style,
 };
-use serde::Deserialize;
+extern crate serde;
+use self::serde::Deserialize;
 use std::{fmt::Display, num::ParseIntError, time::Duration};
 
 #[derive(Debug, Deserialize)]

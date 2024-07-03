@@ -1,5 +1,6 @@
 use std::{convert::TryFrom, fmt::Display};
-use serde::Deserialize;
+extern crate serde;
+use self::serde::Deserialize;
 
 #[derive(Debug, Clone, Copy)]
 pub enum TouchPadSet {

@@ -1,7 +1,8 @@
 extern crate gregorian;
-use super::gender_group::GenderGroup;
 use self::gregorian::Year;
-use serde::Deserialize;
+use super::gender_group::GenderGroup;
+extern crate serde;
+use self::serde::Deserialize;
 
 /// Simple person struct
 #[derive(Debug, Deserialize)]

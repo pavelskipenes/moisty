@@ -1,6 +1,7 @@
 extern crate core;
 use self::core::fmt;
-use serde::Deserialize;
+extern crate serde;
+use self::serde::Deserialize;
 use std::{convert::TryFrom, fmt::Display};
 
 /// Individual distances

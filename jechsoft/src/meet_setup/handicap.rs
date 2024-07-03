@@ -1,5 +1,6 @@
-use serde::Deserialize;
-use std::{fmt::Display, num::ParseIntError, convert::TryFrom};
+extern crate serde;
+use self::serde::Deserialize;
+use std::{convert::TryFrom, fmt::Display, num::ParseIntError};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Handicap {
@@ -11,6 +12,7 @@ pub struct Handicap {
     /// 11 - 13 reduced eye sight up to full blindness. The higher the number the greated sight
     ///    loss.
     /// 14 mental dissability.
+    /// 15 hearing loss
     pub disability_type: u8,
 }
 

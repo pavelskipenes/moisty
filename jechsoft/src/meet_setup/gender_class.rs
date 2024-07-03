@@ -2,9 +2,9 @@ extern crate chrono;
 extern crate gregorian;
 extern crate serde;
 use self::gregorian::Year;
+use self::serde::Deserialize;
 use super::{class::Class, gender_group::GenderGroup};
-use serde::Deserialize;
-use std::{fmt::Display, num::ParseIntError, convert::TryFrom};
+use std::{convert::TryFrom, fmt::Display, num::ParseIntError};
 
 #[derive(Deserialize, Debug)]
 pub struct GenderClass {

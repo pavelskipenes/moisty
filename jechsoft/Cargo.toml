@@ -16,3 +16,7 @@ thiserror = "1.0.37"
 serde-email = "1.1.0"
 serde_path_to_error = "0.1.8"
 gregorian = { version = "0.2.4", features = ["serde"] }
+num = "0.4.1"
+encoding = "0.2.33"
+bytes = "1.6.0"
+find_all = "2.0.0"

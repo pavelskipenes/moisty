@@ -1,5 +1,6 @@
-use serde::Deserialize;
-use std::{fmt::Display, convert::TryFrom};
+extern crate serde;
+use self::serde::Deserialize;
+use std::{convert::TryFrom, fmt::Display};
 
 /// Length of the pool
 #[derive(Deserialize, Debug, Clone, Copy)]

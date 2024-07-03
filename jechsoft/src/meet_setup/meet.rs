@@ -1,3 +1,16 @@
+extern crate chrono;
+extern crate encoding;
+extern crate gregorian;
+extern crate reqwest;
+extern crate serde;
+extern crate serde_email;
+extern crate serde_xml_rs;
+
+use self::chrono::NaiveDate;
+use self::gregorian::Year;
+use self::reqwest::Url;
+use self::serde::Deserialize;
+use self::serde_email::Email;
 use super::{
     age_group::DefinedAgeGroups, australian_rank::AustralianRank,
     australian_world_record::AustralianWorldRecord, award::Award,
@@ -5,27 +18,21 @@ use super::{
     person::Person, pool_category::PoolCategory, qualification_set::QualificationSet,
     session::Session, touch_pad_set::TouchPadSet,
 };
-extern crate chrono;
-extern crate gregorian;
-extern crate reqwest;
-extern crate serde;
-extern crate serde_email;
-
-use self::chrono::NaiveDate;
-use self::gregorian::Year;
-use self::reqwest::Url;
-use self::serde::Deserialize;
-use self::serde_email::Email;
 use std::error::Error;
-use std::{fs::File, io::BufReader, path::Path};
+use std::io::BufReader;
+use std::{fs::File, path::Path};
 
-/// `MeetConfig` is a rust structure that represents `meetsetup.xml` file from Jechsoft Victoria.
-/// This file seems to be a simple settings dump from the application.
+/// `MeetConfig` is a rust structure that represents `meetsetup.xml` file used by Jechsoft Victoria.
+/// This file contains settings for a meet. This structure extract those fields and parses then
+/// into usable rust structures with simple type validation. This file contains only the meet
+/// settings, `meetresults.xml` contains data related to enrollment and results of athletes on the
+/// same meet.
 /// TODOs:
 /// - [ ] Refactor pub products: Vec<(String, Price)>. Look at #[serde(flatten)]
 /// - [ ] Use money package for deserializing currency like [rusty money](https://docs.rs/rusty-money/latest/rusty_money/)
 /// - [ ] Group together configuration for heat list generation
 /// - [ ] Group together configuration for scheduling
+/// - [ ] Add methods for non data type validation that will pass type validation
 #[derive(Deserialize, Debug)]
 #[serde(rename = "MeetSetUp", rename_all = "PascalCase")]
 #[allow(clippy::struct_excessive_bools)]
@@ -292,7 +299,7 @@ pub struct Meet {
     #[serde(deserialize_with = "deserializer::bool")]
     pub unofficial: bool,
 
-    /// TODO: products: HashMap<String, Price>
+    /// TODO: `products: HashMap<String, Price>`
     #[serde(default)]
     pub other_payment1: Option<String>,
 
@@ -348,7 +355,7 @@ pub struct Meet {
 
     pub footer: Option<String>,
 
-    /// Default award configuration for the meet. This value is used if this.events.awards = Award::Default.
+    /// Default award configuration for the meet. This value is used if `this.events.awards = Award::Default`.
     #[serde(rename = "Prizes")]
     pub awards: Option<Award>,
 
@@ -388,190 +395,17 @@ impl Meet {
     /// returns Error if:
     /// - `local_xml_file` cannot be opened.
     /// - deserialization fails
-
     pub fn try_from(local_xml_file: &Path) -> Result<Self, Box<dyn Error>> {
         let file = File::open(local_xml_file)?;
-
         let reader = BufReader::new(file);
+        let meet: Self = serde_xml_rs::de::from_reader(reader)?;
 
-        // TODO: convert from shitty windows encoding to normal utf-8
-        let jd = &mut serde_xml_rs::de::Deserializer::new_from_reader(reader);
-        Ok(serde_path_to_error::deserialize(jd)?)
+        Ok(meet)
     }
-    /*
-       pub fn get_issues(&self) -> Vec<String> {
-           let mut issues = vec![];
-           if self.cancelled {
-               issues.push("meet is cancelled".into());
-               return issues;
-           }
-           if self.nsf_meet_id.is_none() {
-               issues.push("nsf meet id missing".into());
-           }
 
-           if self.date_start.is_none() {
-               issues.push("missing start date".into());
-           }
-
-           if self.date_end.is_none() {
-               issues.push("missing end date".into());
-           }
-
-           if let Some(date_start) = self.date_start {
-               if let Some(date_end) = self.date_end {
-                   if date_end < date_start {
-                       issues.push("end date is before start date".into());
-                   }
-               }
-           }
-
-           // if organization number is set but host club is not and vise versa
-           if self.host_club_organization_no.is_none() && self.host_club.is_some()
-               || self.host_club_organization_no.is_some() && self.host_club.is_none()
-           {
-               issues.push("mismatch between host club and organization number".into());
-           }
-
-           for session_issue in self.get_session_issues() {
-               issues.push(session_issue);
-           }
-           for event_issue in self.get_event_issues() {
-               issues.push(event_issue);
-           }
-
-           for class_issue in self.get_class_issues() {
-               issues.push(class_issue);
-           }
-
-           for qualification_issue in self.get_qualification_issues() {
-               issues.push(qualification_issue);
-           }
-
-           for age_group_issue in self.get_age_group_issues() {
-               issues.push(age_group_issue);
-           }
-
-           issues
-       }
-
-       fn get_age_group_issues(&self) -> Vec<String> {
-           let mut issues = vec![];
-           // TODO
-           // if let Some(age_groups) = &self.age_groups {
-           //     for age_group in age_groups {
-           //         for year in age_group.groups {}
-           //     }
-           // }
-           issues
-       }
-
-       fn get_qualification_issues(&self) -> Vec<String> {
-           let mut issues = vec![];
-           if let Some(qualification_set) = &self.qualification_set {
-               for qualification in &qualification_set.qualifications {
-                   // // calculate the speed
-                   // // if the speed is outside of a certain rage, then it's most likely a bug.
-                   // let speed: u8 =
-                   //     qualification.distance.into() / qualification.qualification_time.into();
-               }
-           }
-           issues
-       }
-
-       fn get_class_issues(&self) -> Vec<String> {
-           let mut issues = vec![];
-           if let Some(birth_years_that_pay_once) = &self.birth_years_pay_once {
-               // check outside of required range
-               // TODO: use year of the meet not current year
-               let meet_year = Year(Local::now().year().into()).abs();
-               for birth_year in birth_years_that_pay_once {
-                   let age = birth_year.abs() - meet_year;
-                   if !(9..=10).contains(&age) {
-                       issues.push(format!(
-                           "class {} is not 9 or 10 years old at the start date of the meet",
-                           birth_year.abs()
-                       ));
-                   }
-               }
-
-               // check that required classes are in the list
-               let mut nine_yo = false;
-               let mut ten_yo = false;
-               for birth_year in birth_years_that_pay_once {
-                   let age = birth_year.abs() - meet_year;
-                   if 9 == age {
-                       nine_yo = true;
-                       continue;
-                   }
-                   if 10 == age {
-                       ten_yo = true;
-                       continue;
-                   }
-                   if nine_yo && ten_yo {
-                       break;
-                   }
-               }
-               if !nine_yo {
-                   issues.push(
-                       "missing class that pays one price that is 9 years old at the start date of the meet".into(),
-                   );
-               }
-               if !ten_yo {
-                   issues.push(
-                       "missing class that pays one price that is 10 years old at the start date of the meet".into(),
-                   );
-               }
-               // TODO: check for duplicates -> mismatch between duplicates.
-           }
-           // TODO: one price all class issues
-           // Following issues required documentation about what those values mean
-           // TODO: WomenSenior
-           // TODO: MenSenior
-           // TODO: WomenJunior
-           // TODO: MenJunior
-           // TODO: WomenJunior2
-           // TODO: MenJunior2
-           // TODO: WomenYoungestFinal
-           // TODO: MenYoungestFinal
-           issues
-       }
-
-       fn get_event_issues(&self) -> Vec<String> {
-           let mut issues = vec![];
-           for event in &self.events {
-               if !event.distance.is_official() {
-                   issues.push(format!(
-                       "event {} - unofficial distance: {} in official meet",
-                       event.id, event.distance
-                   ));
-               }
-           }
-           issues
-       }
-
-       fn get_session_issues(&self) -> Vec<String> {
-           // check that sessions start during the meet
-           let mut issues = vec![];
-           for session in &self.sessions {
-               if let Some(meet_date_start) = self.date_start {
-                   if let Some(meet_date_end) = self.date_end {
-                       if session.date > meet_date_end {
-                           issues.push(format!(
-                               "session: {} start {} is after the meet end {}",
-                               session.id, session.date, meet_date_start
-                           ));
-                       }
-                       if session.date < meet_date_start {
-                           issues.push(format!(
-                               "session: {} start {} is before the meet start {}",
-                               session.id, session.date, meet_date_start
-                           ));
-                       }
-                   }
-               }
-           }
-           issues
-       }
-
-    */
+    // Here we assume that we get the exactly the same name as `MeetInfo::get_filename(&self)`
+    #[must_use]
+    pub fn get_filename(&self) -> String {
+        self.name.replace(' ', "_").to_lowercase()
+    }
 }

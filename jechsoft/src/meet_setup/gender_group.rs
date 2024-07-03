@@ -1,4 +1,5 @@
-use serde::Deserialize;
+extern crate serde;
+use self::serde::Deserialize;
 use std::fmt;
 
 #[derive(Deserialize, Debug)]
@@ -12,6 +13,7 @@ pub enum GenderGroup {
     /// Unconfirmed: Team relays
     Mixed,
 }
+
 #[allow(clippy::recursive_format_impl)]
 impl fmt::Display for GenderGroup {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

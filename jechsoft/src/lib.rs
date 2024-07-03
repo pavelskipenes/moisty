@@ -18,15 +18,6 @@
 #![allow(clippy::blanket_clippy_restriction_lints)]
 #![allow(clippy::missing_inline_in_public_items)]
 #![allow(clippy::print_stdout)]
-extern crate serde;
+pub mod medley;
 pub mod meet_setup;
 pub mod uni_p;
-
-#[cfg(test)]
-mod tests {
-
-    #[test]
-    fn test() {
-        println!("library works");
-    }
-}

@@ -3,11 +3,11 @@ extern crate gregorian;
 extern crate serde;
 use self::chrono::NaiveDate;
 use self::gregorian::Year;
+use self::serde::Deserialize;
 use super::{
     award::Award, deserializer, distance::Distance, gender_group::GenderGroup,
     pool_length::PoolLength, round::Round, sorting::Sorting, style::Style,
 };
-use serde::Deserialize;
 use std::time::Duration;
 
 #[allow(dead_code)]
@@ -55,7 +55,8 @@ pub struct Event {
     #[serde(deserialize_with = "deserializer::option_year", default)]
     pub oldest: Option<Year>,
 
-    pub event_pool_length: PoolLength,
+    #[serde(rename = "EventPoolLength")]
+    pub pool_length: PoolLength,
 
     /// Starting date for the meet
     #[serde(deserialize_with = "deserializer::date")]

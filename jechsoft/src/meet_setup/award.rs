@@ -1,5 +1,10 @@
-use serde::Deserialize;
-use std::{fmt::{self, Display}, convert::TryFrom};
+extern crate serde;
+
+use self::serde::Deserialize;
+use std::{
+    convert::TryFrom,
+    fmt::{self, Display},
+};
 
 #[derive(Debug, Copy, Clone)]
 pub enum Award {

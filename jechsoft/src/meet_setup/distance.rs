@@ -1,7 +1,8 @@
 use super::individual_distance::Error as IndividualError;
 use super::team_distance::Error as TeamError;
 use super::{individual_distance::Individual, team_distance::Team};
-use serde::Deserialize;
+extern crate serde;
+use self::serde::Deserialize;
 use std::convert::TryFrom;
 use std::fmt::{self, Display};
 

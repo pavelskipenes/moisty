@@ -1,11 +1,12 @@
-use std::convert::TryInto;
 use meet_setup::class::chrono::Datelike;
 use std::convert::TryFrom;
+use std::convert::TryInto;
 extern crate chrono;
 extern crate gregorian;
 use self::chrono::Local;
 use self::gregorian::Year;
-use serde::Deserialize;
+extern crate serde;
+use self::serde::Deserialize;
 use super::handicap::Handicap;
 
 /// Each Athlete is a member of one class. Athletes that are in the same Class compete against each other. `Athlete`s cannot compete against each other across `Class`es An Athlete can be a member of only one `Class`. `Athlete`s `Class` is dependent on his/her age.

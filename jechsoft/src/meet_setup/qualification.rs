@@ -2,7 +2,8 @@ use super::{
     class::Class, distance::Distance, gender_group::GenderGroup, pool_length::PoolLength,
     style::Style,
 };
-use serde::Deserialize;
+extern crate serde;
+use self::serde::Deserialize;
 use std::time::Duration;
 
 /// Single qualification sets limits on who can enroll to a meet.
@@ -19,21 +20,20 @@ pub struct Qualification {
     #[serde(rename = "Sex")]
     pub athlete_gender: GenderGroup,
 
-    /// Length of the pool of the TimeResult required.
-    #[serde(rename = "PoolLength")]
-    pub event_pool_length: PoolLength,
+    /// Length of the pool of the `TimeResult` required.
+    pub pool_length: PoolLength,
 
     /// Distance of the Event that the qualification applies to
     #[serde(rename = "DistanceLength")]
-    pub event_distance: Distance,
+    pub distance: Distance,
 
     /// Style this qualification applies to.
     #[serde(rename = "Distanceart")]
-    pub event_style: Style,
+    pub style: Style,
 
     /// Max time an athlete can have for successful enrollment.
-    #[serde(deserialize_with = "duration")]
-    pub qualification_time: Duration,
+    #[serde(rename = "QualificationTime", deserialize_with = "duration")]
+    pub time: Duration,
 }
 
 /// Deserializer for Qualification structure. We need to use a custom deserializer because

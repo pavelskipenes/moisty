@@ -1,4 +1,5 @@
-use serde::Deserialize;
+extern crate serde;
+use self::serde::Deserialize;
 use std::{
     convert::{TryFrom, TryInto},
     fmt::{self, Display},
