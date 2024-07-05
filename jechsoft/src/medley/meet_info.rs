@@ -2,10 +2,11 @@ extern crate chrono;
 extern crate reqwest;
 extern crate serde;
 
+use super::serde::Deserialize;
+use crate::meet_setup::deserializer;
+
 use self::chrono::NaiveDate;
 use self::reqwest::Url;
-use super::serde::Deserialize;
-use meet_setup::deserializer;
 
 /// Meet info structure parses output from a url endpoint used by `JechSoft Victoria`
 /// for searching upcoming meets and download them into it's database without downloading

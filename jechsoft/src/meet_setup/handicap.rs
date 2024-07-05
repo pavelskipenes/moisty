@@ -70,7 +70,7 @@ impl Handicap {
             11..=13 => "reduced eye sight or blind",
             14 => "mental disability",
             15 => "deaf",
-            0 | 16..=u8::MAX => panic!("invalid disability grade"),
+            0 | 16..=u8::MAX => unimplemented!(),
         };
         let styles = match self.style_group {
             StyleGroup::FreestyleBackstrokeButterfly => "freestyle, backstroke and butterfly",

@@ -2,21 +2,23 @@
 name = "jechsoft"
 version = "0.1.0"
 description= "Jechsoft Victoria interface library"
-
+edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-serde = { version = "1.0.148", features = ["derive"] }
-chrono = "0.4.23"
-time = { version = "0.3.17", features = ["parsing", "formatting", "macros"] }
-reqwest = { version = "0.11.13", features = ["blocking"] }
-url = { version = "2.3.1", features = ["serde"] }
+log = { version = "0.4.22" }
+serde = { version = "1.0.203", features = ["derive"] }
+chrono = "0.4.38"
+time = { version = "0.3.36", features = ["parsing", "formatting", "macros"] }
+reqwest = { version = "0.12.5", features = ["blocking"] }
+url = { version = "2.5.2", features = ["serde"] }
 serde-xml-rs = "0.6.0"
-thiserror = "1.0.37"
-serde-email = "1.1.0"
-serde_path_to_error = "0.1.8"
+thiserror = "1.0.61"
+serde-email = "3.0.1"
+serde_path_to_error = "0.1.16"
 gregorian = { version = "0.2.4", features = ["serde"] }
-num = "0.4.1"
+num = "0.4.3"
 encoding = "0.2.33"
 bytes = "1.6.0"
 find_all = "2.0.0"
+env_logger = "0.11.3"

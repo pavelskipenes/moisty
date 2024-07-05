@@ -1,4 +1,3 @@
-#![feature(fs_try_exists)]
 #![feature(iter_next_chunk)]
 #![feature(array_chunks)]
 #![feature(iter_array_chunks)]

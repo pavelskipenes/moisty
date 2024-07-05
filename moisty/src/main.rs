@@ -5,8 +5,12 @@ extern crate directories;
 extern crate jechsoft;
 extern crate tabled;
 
+mod cli;
+
+use crate::clap::Parser;
+use crate::cli::Cli;
+
 use chrono::Local;
-use clap::Parser;
 use colored::Colorize;
 use directories::BaseDirs;
 use jechsoft::medley::utils::{download_meets, get_meet_list};
@@ -15,56 +19,11 @@ use std::fs;
 use std::{io, path::PathBuf};
 use tabled::{builder::Builder, settings::Style};
 
-#[derive(Parser)]
-#[command(author, version, about, long_about = None)]
-struct Cli {
-    /// Download latest meets from medley.no
-    #[arg(
-        short,
-        long,
-        value_name = "download new meets from server and cache them",
-        default_value_t = false
-    )]
-    pub download: bool,
-
-    /// Output table of events from meets
-    #[arg(
-        short,
-        long,
-        value_name = "print short info about each event in the meet",
-        default_value_t = false
-    )]
-    pub info: bool,
-
-    /// clear out cache directory of saved meets
-    #[arg(
-        short,
-        long,
-        value_name = "clear cached meets",
-        default_value_t = false
-    )]
-    pub clear_cache: bool,
-
-    #[arg(
-        short,
-        long,
-        value_name = "list available meets",
-        long_help = "lists all the meets that are avaialble locally",
-        default_value_t = false
-    )]
-    pub list: bool,
-
-    /// Path to meetsetup file
-    #[arg(
-        value_name = "meet setup files",
-        long_help = "path to meetsetup file. Usually exported as meetsetup.xml"
-    )]
-    pub meetsetup_path: Option<String>,
-}
 
 // TODO: download meet files into one directory and move them if parsing is successful.
 // TODO: auto complete on command line the parsed meets?
 fn main() -> io::Result<()> {
+    env_logger::init();
     let cli = Cli::parse();
 
     let base_dir = BaseDirs::new();
@@ -83,10 +42,10 @@ fn main() -> io::Result<()> {
     fs::create_dir_all(parsed_dir).unwrap();
 
     if cli.download {
-        let date = Local::now();
-        match get_meet_list(date) {
+        let search_date_start = cli.date.unwrap_or(Local::now().naive_local().date());
+        match get_meet_list(search_date_start) {
             Ok(meets_to_download) => download_meets(&download_dir, meets_to_download),
-            Err(why) => eprintln!("{}", why),
+            Err(why) => panic!("{why}"),
         };
     }
 
@@ -106,9 +65,8 @@ fn main() -> io::Result<()> {
         let meet = match Meet::try_from(meet_setup_file) {
             Ok(meet) => meet,
             Err(why) => {
-                eprintln!(
-                    "[{}][{}]: {why}",
-                    "ERROR".red(),
+                log::warn!(
+                    "[{}]: {why}",
                     &meet_setup_file
                         .file_name()
                         .unwrap()
@@ -120,9 +78,25 @@ fn main() -> io::Result<()> {
         };
 
         if cli.list {
+            let mut header_builder = Builder::default();
+            header_builder.push_record::<&[String; 3]>(&[
+                "NSF meet id".into(),
+                "Date".into(),
+                "Name".into(),
+            ]);
             match meet.nsf_meet_id {
                 Some(nsf_meet_id) => {
-                    println!("[{:0>10}] {}, {}", nsf_meet_id, meet.name, meet.date)
+                    if meet.date_start.is_some() && meet.date_end.is_some() {
+                        println!(
+                            "[{:0>10}] [{} {}] {}",
+                            nsf_meet_id,
+                            meet.date_start.unwrap(),
+                            meet.date_end.unwrap(),
+                            meet.name
+                        )
+                    } else {
+                        println!("[{:0>10}] {}, {}", nsf_meet_id, meet.date, meet.name)
+                    }
                 }
                 None => println!("[MISSING] {}, {}", meet.name, meet.date),
             };

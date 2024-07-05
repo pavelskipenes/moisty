@@ -117,8 +117,8 @@ pub struct Meet {
     )]
     pub men_senior: Option<Year>,
 
-    // TODO: men: [Option<Year>; 2];
-    // TODO: women: [Option<Year>; 2];
+    // TODO: men_junior: Vec<Year>;
+    // TODO: women_junior: Vec<Year>;
     #[serde(default, deserialize_with = "deserializer::option_year")]
     pub women_junior: Option<Year>,
 
@@ -191,6 +191,9 @@ pub struct Meet {
     /// Starts always with "GR" and then 11 numbers with leading zeros.
     pub host_club_organization_no: Option<String>, // TODO: create struct for this type
 
+    /// Competition type specifies what kind of competition it is and what rules apply for it.
+    /// A single competiton type will have some rules specifying whether certain age groups can
+    /// compete and whether there are any entrollment qualifications for the meet.
     pub competition_type_id: CompetitionType,
 
     pub community: Option<String>,
@@ -257,12 +260,17 @@ pub struct Meet {
     #[serde(deserialize_with = "deserializer::bool")]
     pub write_country: bool,
 
+    /// A configuration that controls whether records for the event should be printed in the heat
+    /// lists.
+    // TODO: group this setting into heat list congiguration
     #[serde(rename = "RecordsInHeatlist", deserialize_with = "deserializer::bool")]
     pub records_in_heat_list: bool,
 
     #[serde(default, deserialize_with = "deserializer::option_bool")]
     pub write_first_lap: Option<bool>,
 
+    /// A configuration that controls whether page number should be printed in heat lists.
+    // TODO: group this setting into heat list congiguration
     #[serde(
         rename = "PageNumberInHeatlist",
         deserialize_with = "deserializer::option_bool"
@@ -299,7 +307,7 @@ pub struct Meet {
     #[serde(deserialize_with = "deserializer::bool")]
     pub unofficial: bool,
 
-    /// TODO: `products: HashMap<String, Price>`
+    // TODO: `products: HashSet<String, Price>`
     #[serde(default)]
     pub other_payment1: Option<String>,
 
