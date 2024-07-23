@@ -2,7 +2,7 @@ extern crate serde;
 use self::serde::Deserialize;
 use std::fmt;
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "UPPERCASE")]
 pub enum GenderGroup {
     /// restrict athletes to male participants only

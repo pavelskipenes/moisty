@@ -5,7 +5,7 @@ extern crate serde;
 use self::serde::Deserialize;
 
 /// Simple person struct
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Person {
     /// Surname.
     #[serde(rename = "LastName")]

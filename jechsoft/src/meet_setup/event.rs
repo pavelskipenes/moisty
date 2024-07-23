@@ -11,7 +11,7 @@ use super::{
 use std::time::Duration;
 
 #[allow(dead_code)]
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 #[allow(clippy::struct_excessive_bools)]
 #[serde(rename_all = "PascalCase")]
 

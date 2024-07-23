@@ -8,7 +8,7 @@ use super::deserializer;
 
 /// `Session` is a set of continuous `Event`s without a break.
 /// A `Meet` have at least one `Session` and at most one `Session` per `Event`.
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct Session {
     /// Session id.
     #[serde(rename = "SessionId")]

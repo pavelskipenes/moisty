@@ -10,7 +10,7 @@ use self::serde::Deserialize;
 use std::fmt::Display;
 
 /// Sorting method
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Sorting {
     /// Sort with the fastest qualification time in the center of the pool and the last heat.
     /// Sort entries by enrollment time
@@ -32,6 +32,7 @@ pub enum Sorting {
     Preliminary,
     Hcpresrprejrfin,
     Hcfinsrfin,
+    AgeGroupeDFinal,
 }
 
 #[allow(clippy::recursive_format_impl)]
@@ -40,6 +41,7 @@ impl Display for Sorting {
         match f.align() {
             Some(_) => f.pad(&self.to_string()),
             None => match self {
+                Self::AgeGroupeDFinal => write!(f, "Age group D Final"),
                 Self::Final => write!(f, "Final"),
                 Self::FinalAgeGroupTime => write!(f, "Final, age then time"),
                 Self::FinalTimeAgeGroup => write!(f, "Final, time then age"),
@@ -62,6 +64,7 @@ impl<'de> Deserialize<'de> for Sorting {
     {
         let s: String = serde::de::Deserialize::deserialize(deserializer)?;
         match s.as_str() {
+            "AGEGROUPEDFINAL" => Ok(Self::AgeGroupeDFinal),
             "FINAL" => Ok(Self::Final),
             "PARTFINAL" => Ok(Self::PartFinal),
             "FINALAGEGROUPTIME" => Ok(Self::FinalAgeGroupTime),

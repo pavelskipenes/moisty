@@ -9,7 +9,7 @@ use std::time::Duration;
 /// Single qualification sets limits on who can enroll to a meet.
 /// `Athlete`s `TimeResult` has to be less than `qualification_time` to
 /// enroll.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "PascalCase")]
 pub struct Qualification {
     /// Qualification is valid for this class.

@@ -74,3 +74,8 @@ If you are bored feel free to tweak on this as well.
 
 - user facing cli tools can be created in `/moisty/src`
 - libraries that interface with jechsoft can be placed in `/jechsoft/src/<project>`
+
+add protocol to malformed urls in files. Run inside `~/.cache/moisty/meets/downloads/`
+```
+find . -type f -exec sed -i 's|<Homepage>http://|<Homepage>https://|g; s|<Homepage>www\.\([^[:space:]]*\)</Homepage>|<Homepage>https://\1</Homepage>|g; s|<Homepage>https://https://|<Homepage>https://|g' {} +
+```

@@ -2,7 +2,7 @@ extern crate serde;
 use self::serde::Deserialize;
 use std::fmt;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[allow(dead_code)]
 pub enum Round {
     Final,

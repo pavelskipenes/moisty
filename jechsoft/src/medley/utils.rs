@@ -52,8 +52,8 @@ pub fn download_meets(meets_directory: &Path, meet_infos: Vec<MeetInfo>) {
             }
             Ok(true) => {
                 log::debug!(
-                    "skipping {} beacuse it already exists in the cache directory",
-                    meet_info.name
+                    "skipping {} {} beacuse it already exists in the cache directory",
+                    meet_info.name, meet_info.id
                 );
                 continue;
             }
@@ -70,10 +70,6 @@ pub fn download_meets(meets_directory: &Path, meet_infos: Vec<MeetInfo>) {
                         continue;
                     }
                 };
-
-                // TODO: we receive last modification date on the downloaded file.
-                // Can we get this information without downloading the full file?
-                // dbg!(&response.headers().get("last-modified"));
 
                 let content = response.bytes();
                 let content = match &content {
@@ -99,7 +95,7 @@ pub fn download_meets(meets_directory: &Path, meet_infos: Vec<MeetInfo>) {
                 let mut meet_config_file = match File::create(&meet_path) {
                     Ok(file) => file,
                     Err(why) => {
-                        log::error!("[{}] {}", &meet_info.name, why);
+                        log::error!("[{}] {} {}", &meet_info.name, why, &meet_path.display());
                         continue;
                     }
                 };

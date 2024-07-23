@@ -33,7 +33,7 @@ use std::{fs::File, path::Path};
 /// - [ ] Group together configuration for heat list generation
 /// - [ ] Group together configuration for scheduling
 /// - [ ] Add methods for non data type validation that will pass type validation
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 #[serde(rename = "MeetSetUp", rename_all = "PascalCase")]
 #[allow(clippy::struct_excessive_bools)]
 #[serde(deny_unknown_fields)]
@@ -202,11 +202,11 @@ pub struct Meet {
     pub competition_type: String,
 
     /// Url to where results can be found.
-    #[serde(default, rename = "ResultWebaddress")]
+    #[serde(default, rename = "ResultWebaddress", deserialize_with="deserializer::url")]
     pub result_web_address: Option<Url>,
 
     /// homepage
-    #[serde(default, rename = "Homepage")]
+    #[serde(default, rename = "Homepage", deserialize_with="deserializer::url")]
     pub home_page: Option<Url>,
 
     /// enrollment email address
@@ -307,7 +307,10 @@ pub struct Meet {
     #[serde(deserialize_with = "deserializer::bool")]
     pub unofficial: bool,
 
-    // TODO: `products: HashSet<String, Price>`
+    // Custom products that are being provided on the meet
+    // #[serde(default, deserialize_with = "deserializer::product")]
+    // pub products: HashMap<String, u16>,
+
     #[serde(default)]
     pub other_payment1: Option<String>,
 
@@ -413,7 +416,8 @@ impl Meet {
 
     // Here we assume that we get the exactly the same name as `MeetInfo::get_filename(&self)`
     #[must_use]
-    pub fn get_filename(&self) -> String {
-        self.name.replace(' ', "_").to_lowercase()
+    pub fn get_filename(&self) -> Option<String> {
+        self.nsf_meet_id.map(|id| format!("{id:0<11}"))
+
     }
 }

@@ -1,17 +1,19 @@
+#![feature(error_iter)]
+
 extern crate chrono;
 extern crate clap;
 extern crate colored;
 extern crate directories;
 extern crate jechsoft;
 extern crate tabled;
+extern crate url;
 
 mod cli;
+// mod validators;
 
 use crate::clap::Parser;
 use crate::cli::Cli;
-
 use chrono::Local;
-use colored::Colorize;
 use directories::BaseDirs;
 use jechsoft::medley::utils::{download_meets, get_meet_list};
 use jechsoft::meet_setup::meet::Meet;
@@ -19,11 +21,10 @@ use std::fs;
 use std::{io, path::PathBuf};
 use tabled::{builder::Builder, settings::Style};
 
-
 // TODO: download meet files into one directory and move them if parsing is successful.
 // TODO: auto complete on command line the parsed meets?
 fn main() -> io::Result<()> {
-    env_logger::init();
+    colog::init();
     let cli = Cli::parse();
 
     let base_dir = BaseDirs::new();
@@ -49,7 +50,7 @@ fn main() -> io::Result<()> {
         };
     }
 
-    let meets = match cli.meetsetup_path {
+    let meet_setup_paths = match cli.meetsetup_path {
         Some(path_meetsetup_file) => {
             vec![PathBuf::from(path_meetsetup_file)]
         }
@@ -60,23 +61,28 @@ fn main() -> io::Result<()> {
             .collect::<Vec<_>>(),
     };
 
-    for meet_setup_file in &meets {
-        // if parse downloded meets
-        let meet = match Meet::try_from(meet_setup_file) {
-            Ok(meet) => meet,
-            Err(why) => {
-                log::warn!(
-                    "[{}]: {why}",
-                    &meet_setup_file
-                        .file_name()
-                        .unwrap()
-                        .to_string_lossy()
-                        .green()
-                );
-                continue;
-            }
-        };
+    let (meets, failed): (Vec<_>, Vec<_>) = meet_setup_paths
+        .into_iter()
+        .map(|meet_setup_file| Meet::try_from(&meet_setup_file))
+        .partition(Result::is_ok);
 
+    let meets: Vec<_> = meets.into_iter().map(Result::unwrap).collect();
+    let failed: Vec<_> = failed.into_iter().map(Result::unwrap_err).collect();
+
+    let meets_count = meets.len();
+    let failed_count = failed.len();
+
+    log::info!(
+        "parsed {} out of {} meets",
+        meets_count,
+        meets_count + failed_count
+    );
+
+    for fail in failed {
+        log::warn!("{fail}");
+    }
+
+    for meet in meets {
         if cli.list {
             let mut header_builder = Builder::default();
             header_builder.push_record::<&[String; 3]>(&[
@@ -84,36 +90,39 @@ fn main() -> io::Result<()> {
                 "Date".into(),
                 "Name".into(),
             ]);
-            match meet.nsf_meet_id {
-                Some(nsf_meet_id) => {
-                    if meet.date_start.is_some() && meet.date_end.is_some() {
-                        println!(
-                            "[{:0>10}] [{} {}] {}",
-                            nsf_meet_id,
-                            meet.date_start.unwrap(),
-                            meet.date_end.unwrap(),
-                            meet.name
-                        )
-                    } else {
-                        println!("[{:0>10}] {}, {}", nsf_meet_id, meet.date, meet.name)
-                    }
-                }
-                None => println!("[MISSING] {}, {}", meet.name, meet.date),
-            };
+
+            if meet.date_start.is_some() && meet.date_end.is_some() {
+                println!(
+                    "[{:0>10}] [{} {}] {}",
+                    meet.nsf_meet_id.unwrap_or(0),
+                    meet.date_start.unwrap(),
+                    meet.date_end.unwrap(),
+                    meet.name
+                )
+            } else {
+                println!(
+                    "[{:0>10}] {}, {}",
+                    meet.nsf_meet_id.unwrap_or(0),
+                    meet.date,
+                    meet.name
+                )
+            }
         }
 
-        if cli.info {
+        if cli.table {
             let mut header_builder = Builder::default();
-            header_builder.push_record::<&[String; 4]>(&[
-                "Meet name".into(),
-                "Date".into(),
-                "Sessions".into(),
-                "NSF id".into(),
+            header_builder.push_record::<[&str; 5]>([
+                "Meet name",
+                "Date",
+                "Sessions",
+                "Location",
+                "NSF id",
             ]);
             header_builder.push_record(&[
                 meet.name,
                 meet.date,
                 meet.sessions.len().to_string(),
+                meet.location,
                 match meet.nsf_meet_id {
                     Some(nsf_meet_id) => format!("{:0>10}", nsf_meet_id),
                     None => "".to_string(),

@@ -7,7 +7,7 @@ pub mod class;
 mod competition_type;
 pub mod deserializer;
 pub mod distance;
-mod event;
+pub mod event;
 pub mod gender_class;
 pub mod gender_group;
 mod handicap;

@@ -48,19 +48,16 @@ pub struct MeetInfo {
 }
 
 impl MeetInfo {
-    /// Generate a consistent filename from it's meet name
-    // Assumed that this method will yield exactly the same result as `Meet::get_filename(&self)`
-    // It would probably be wise to combine those two functions together into one in the future
-    // It would also be nice to use more information and get more consistent meet name across
-    // different years and so on.
-    // TODO: consider using nsf_medley_id to index files
-    // pros:
-    // - unique for norwegian meets
-    // cons:
-    // - optional to specify, specially for unofficial meets
-    // - international meets might not have it
+    /// Generate a file name for each meet.
+    /// File names are generated using medley id because they are unique.
+    /// pros:
+    /// - unique for norwegian meets
+    ///   cons:
+    /// - optional to specify, specially for unofficial meets
+    /// - international meets might not have it
+    /// - non memebers of NSF will not have this id
     #[must_use]
     pub fn get_filename(&self) -> String {
-        self.name.replace(' ', "_").to_lowercase()
+        format!("{:0>11}", self.id)
     }
 }

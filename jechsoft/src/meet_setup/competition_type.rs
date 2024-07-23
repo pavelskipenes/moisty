@@ -9,6 +9,11 @@ use std::{
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum CompetitionType {
     /// Meet for mentally disabled athletes. See `Class::(style_group: Handicap{StyleGroup::FreestyleBackstrokeButterfly, dissability_type: 14})`
+    /// Open meets don't have limitations on who can join
+    Open = 1,
+    /// District Championship
+    DistrictChampionship = 2,
+    /// Meet for mentally disabled athletes
     MentallyDisabledMeet = 3,
     /// International championship
     International = 5,
@@ -23,7 +28,7 @@ pub enum CompetitionType {
     /// Regional Age Class Meet / LÅMØ
     RegionalAgeGroupMeet = 16,
     // AgeClassChampionship / ÅM
-    // AgeClassChempionship = todo!(),
+    // AgeClassChampionship = todo!(),
     //
     /// "Krets/Regionstevne"
     DistrictRegionalMeet = 18,
@@ -38,6 +43,8 @@ impl Display for CompetitionType {
             // Need to split up self into team and individual. self.to_string() will recursively call this function,
             Some(_) => f.pad(&self.to_string()),
             None => match self {
+                Self::Open => write!(f, "open"),
+                Self::DistrictChampionship => write!(f, "district championship"),
                 Self::MentallyDisabledMeet => write!(f, "meet for mentally disabled athletes"),
                 Self::International => write!(f, "international championship"),
                 Self::Unofficial => write!(f, "unofficial"),
@@ -79,6 +86,8 @@ impl TryFrom<u8> for CompetitionType {
 
     fn try_from(value: u8) -> Result<Self, Self::Error> {
         match value {
+            1 => Ok(Self::Open),
+            2 => Ok(Self::DistrictChampionship),
             3 => Ok(Self::MentallyDisabledMeet),
             4 => Ok(Self::NationalMeetWithAthletesFromForeginNations),
             5 => Ok(Self::International),
@@ -88,7 +97,7 @@ impl TryFrom<u8> for CompetitionType {
             16 => Ok(Self::RegionalAgeGroupMeet),
             18 => Ok(Self::DistrictRegionalMeet),
             19 => Ok(Self::NonNorwegianMeet),
-            // ?? => Ok(Self::AgeClassChempionship),
+            // ?? => Ok(Self::AgeClassChampionship),
             _ => Err(Error::CompetitionTypeIdDoesNotExists),
         }
     }
@@ -110,8 +119,8 @@ impl<'de> Deserialize<'de> for CompetitionType {
     where
         D: serde::Deserializer<'de>,
     {
-        const EXPECTED_DESERIALIZER_INPUT: [&str; 9] =
-            ["3", "4", "5", "6", "8", "15", "16", "18", "19"];
+        const EXPECTED_DESERIALIZER_INPUT: [&str; 11] =
+            ["1", "2", "3", "4", "5", "6", "8", "15", "16", "18", "19"];
 
         let deserialized_value: String = Deserialize::deserialize(deserializer)?;
         let parse_error: D::Error =

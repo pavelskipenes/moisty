@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use clap::Parser;
 
 #[derive(Parser)]
@@ -16,10 +17,10 @@ pub struct Cli {
     #[arg(
         short,
         long,
-        value_name = "print short info about each event in the meet",
+        value_name = "display a table with meets content",
         default_value_t = false
     )]
-    pub info: bool,
+    pub table: bool,
 
     /// clear out cache directory of saved meets
     #[arg(
@@ -41,8 +42,8 @@ pub struct Cli {
 
     #[arg(
         long,
-        value_name = "date of the meet",
-        long_help = "date needs this format: YYYY-MM-DD"
+        value_name = "meet date",
+        long_help = "Sets the search date for the meet to be downloaded. This needs to be used together with the download flag. Meet date needs to be in following format: YYYY-MM-DD"
     )]
     pub date: Option<chrono::NaiveDate>,
 

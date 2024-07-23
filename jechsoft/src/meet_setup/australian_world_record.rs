@@ -5,6 +5,7 @@ use std::{convert::TryFrom, fmt::Display};
 #[derive(Debug, Deserialize, Copy, Clone)]
 #[serde(rename_all = "UPPERCASE")]
 pub enum AustralianWorldRecord {
+    ShortCourse,
     LongCourse,
     Same,
 }
@@ -32,6 +33,7 @@ impl TryFrom<&str> for AustralianWorldRecord {
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         match value {
             "long course" => Ok(Self::LongCourse),
+            "short course" => Ok(Self::ShortCourse),
             "same" => Ok(Self::Same),
             _ => Err(Error::DoesNotExists),
         }

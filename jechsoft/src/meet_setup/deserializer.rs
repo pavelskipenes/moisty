@@ -2,12 +2,16 @@ extern crate chrono;
 extern crate gregorian;
 extern crate serde;
 extern crate time;
+
 use self::chrono::NaiveDate;
 use self::gregorian::Year;
 use self::serde::Deserialize;
 use self::time::{format_description::FormatItem, macros::format_description, Time};
 use super::{event::Event, session::Session};
+use serde::de::{self, MapAccess, Visitor};
+use std::collections::HashMap;
 use std::time::Duration;
+use url::Url;
 
 /// # Returns
 /// returns `Ok(true)` if the input is "TRUE" and `Ok(false)` if the input is "FALSE"
@@ -220,4 +224,35 @@ where
         new_vec.push(year);
     }
     Ok(Some(new_vec))
+}
+
+/// # Errors
+/// Will return error if the string is not a valid url even after minimal patching
+pub fn url<'de, D>(deserializer: D) -> Result<Option<Url>, D::Error>
+where
+    D: serde::de::Deserializer<'de>,
+{
+    let s: String = serde::de::Deserialize::deserialize(deserializer)?;
+    if s.is_empty() {
+        return Ok(None);
+    }
+    match Url::parse(&s) {
+        Ok(url) => Ok(Some(url)),
+        Err(err) => match err {
+            url::ParseError::RelativeUrlWithoutBase => {
+                let mut patched = s
+                    .replace("www.", "")
+                    .replace("https://", "")
+                    .replace("http://", "");
+
+                patched.insert_str(0, "https://");
+
+                match Url::parse(&patched) {
+                    Ok(url) => Ok(Some(url)),
+                    Err(error) => Err(serde::de::Error::custom(error)),
+                }
+            }
+            other_error => Err(serde::de::Error::custom(other_error)),
+        },
+    }
 }
