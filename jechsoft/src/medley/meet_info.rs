@@ -33,12 +33,26 @@ pub struct MeetInfo {
     #[serde(rename = "arrangor")]
     pub host: String,
 
-    /// Norwegian swimming federation meet id.
-    /// Required for all official meets in Norway.
-    /// Unofficial meets do not require meet id.
-    /// represented as 11 digit numerical digit with leading zeros.
+    /// Norwegian Swimming Federation meet id is a uniqe numerical value that can be used to
+    /// identify meets. This value is represented as a numerical string containing ten digits and leading
+    /// zeroes.
+    ///
+    /// To construct a `Meet` you need to supply a valid id, hense the type being `u32` and not
+    /// `Option<u32>`. If meet id is not available for whatever reason you can supply a fake one as
+    /// a temporary workaround. NSF is generating id's incrementally so temporary ids can be set by
+    /// decrementing max value `9999999999` until one is avaialble.
+    ///
+    /// This property is present for all meets that are *not* `CompetitinType::Unofficial`
+    /// This property is *not* required for meets that are of `CompetitinType::Unofficial` type but
+    /// they often do.
+    /// All meets that are served by
+    /// (Norwegian Swimming Federation)[<https://medley.livetiming.no>] usually have a medley id
+    /// Competitions organized outside of the NSF ususally do not have a medley id.
+    /// These include organizations like for instance Royal Military Academies which are not members
+    /// of the NSF but organize anually competitions among them selves.
+    ///
     /// # Example:
-    /// "00000012345"
+    /// "0012345678"
     #[serde(rename = "nsfstevneid")]
     pub id: u32,
 
