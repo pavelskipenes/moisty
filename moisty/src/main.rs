@@ -79,7 +79,7 @@ fn main() -> io::Result<()> {
     );
 
     for fail in failed {
-        log::warn!("{fail}");
+        log::error!("{fail}");
     }
 
     for meet in meets {
