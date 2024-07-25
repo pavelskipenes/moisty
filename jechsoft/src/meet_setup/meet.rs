@@ -378,7 +378,7 @@ pub struct Meet {
     pub extra_time: Option<u16>,
 
     /// List of sessions in the meet. A session is a set of continuos heats without breaks.
-    #[serde(deserialize_with = "deserializer::session")]
+    #[serde(default, deserialize_with = "deserializer::session")]
     pub sessions: Vec<Session>,
 
     /// List of qualification requirements for enrollment.
